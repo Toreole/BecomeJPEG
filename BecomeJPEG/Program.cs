@@ -19,26 +19,26 @@ namespace BecomeJPEG
             //create the videocapture. this will default to the first installed device.
             VideoCapture capture = new VideoCapture();
 
-            //subscribe to the ImageGrabbed event.
+            //defining both of these up here avoids a LOT of garbage.
+            //frame is required for compressing the data into Jpeg format.
+            Image<Bgr, byte> frame = new Image<Bgr, byte>(capture.Width, capture.Height);
+            //the frameMatrix is needed to read the jpeg data into a displayable image again.
+            Mat frameMatrix = new Mat(capture.Width, capture.Height, DepthType.Cv8U, 3);
+
+            //subscribe to the ImageGrabbed event. This will follow the device's framerate.
             capture.ImageGrabbed += new EventHandler(delegate (object sender, EventArgs e)
             {
-                Mat frame = new Mat(capture.Width, capture.Height, DepthType.Default, 3);
+                //retrieve the grabbed frame data.
                 capture.Retrieve(frame);
                 
-
-                Image<Bgr, byte> img = frame.ToImage<Bgr, byte>();
-
                 //jpeg compress the hell out of it.
-                byte[] data = img.ToJpegData(0);
-                ////dispose the old image data.
-                //img.Dispose();
+                byte[] data = frame.ToJpegData(0);
+                
+                //read the JPEG back into frameMatrix.
+                CvInvoke.Imdecode(data, ImreadModes.Color, frameMatrix);
 
-                CvInvoke.Imdecode(data, ImreadModes.Color, frame);
                 //show the image.
-                CvInvoke.Imshow(windowName, frame);
-
-                img.Dispose();
-                frame.Dispose();
+                CvInvoke.Imshow(windowName, frameMatrix);
             });
 
             //start the image grabbing thread.
