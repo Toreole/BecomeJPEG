@@ -17,6 +17,7 @@ But there's several commands you can use inside the console:
 | template save [name] | Saves the current settings as a template with the specified name. Will override existing templates of that name. |
 | template delete [name] | Deletes the template [name] |
 | template list | Shows a list of available templates. |
+| stoplag | Resets lagtime and lagrandom to 0, causing the next frame from the camera to update the preview without having to wait for the lagtime offset. Useful when you set lagtime/lagrandom to a very high value by accident. |
 
 ### Examples 
 
