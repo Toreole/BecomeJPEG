@@ -77,16 +77,23 @@ namespace BecomeJPEG
                 }
                 //retrieve the grabbed frame data.
                 capture.Retrieve(frame);
-                
+
+                //if quality is 100 (aka no compression, just show the frame directly.)
+                if (CompressionQuality == 100)
+                {
+                    CvInvoke.Imshow(windowName, frame);
+                    return;
+                }
+
                 //jpeg compress the hell out of it.
                 //this is the only source of garbage in this event, and I dont think there is a way to avoid it.
                 byte[] data = frame.ToJpegData(CompressionQuality);
-                
+
                 //read the JPEG back into frameMatrix.
                 CvInvoke.Imdecode(data, ImreadModes.Color, frameMatrix);
-
                 //show the image.
                 CvInvoke.Imshow(windowName, frameMatrix);
+
             });
 
             //start the image grabbing thread.
