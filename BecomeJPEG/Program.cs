@@ -6,10 +6,14 @@ using System.Threading;
 using System.IO;
 using System.Collections.Generic;
 
+using Encoding = System.Text.Encoding;
+
 namespace BecomeJPEG
 {
     internal class Program
     {
+        private const string templateFile = "templates.txt";
+
         //settings and and a Random instance that should just be accessible.
         static Random rng = new Random();
         static volatile float frameDropChance = 0.85f;
@@ -18,6 +22,8 @@ namespace BecomeJPEG
         static volatile int frameLagRandom = 400;
         //readonly windowName.
         static readonly string windowName = "BecomeJPEG Preview";
+
+        static readonly Encoding encoder = Encoding.UTF8;
 
         //list of templates.
         static List<QualityTemplate> templates = null;
@@ -104,7 +110,7 @@ namespace BecomeJPEG
 
         private static void LoadTemplatesFromDrive()
         {
-            if (File.Exists("templates.txt") == false)
+            if (File.Exists(templateFile) == false)
             {
                 //default templates.
                 templates = new List<QualityTemplate>()
@@ -116,11 +122,39 @@ namespace BecomeJPEG
             }
             else
             {
-                FileStream stream = File.OpenRead("templates.txt");
+                FileStream stream = File.OpenRead(templateFile);
                 byte[] buffer = new byte[stream.Length];
                 //read the entire file.
                 stream.Read(buffer, 0, (int)stream.Length);
+                //immediately dispose the stream.
+                stream.Flush();
+                stream.Dispose();
+                string data = encoder.GetString(buffer);
+                string[] entries = data.Split('\n');
+                //initialize templates to an appropriate length.
+                templates = new List<QualityTemplate>(entries.Length);
+                //add all entries as QualityTemplates.
+                foreach (var s in entries)
+                {
+                    if (string.IsNullOrEmpty(s))
+                        continue;
+                    templates.Add(QualityTemplate.FromString(s));
+                }
             }
+        }
+
+        //store templates in a file.
+        private static void SaveTemplatesToDrive()
+        {
+            //always create a new file or replace the contents of the previous one.
+            FileStream stream = File.Open(templateFile, FileMode.Create);
+            for(int i = 0; i < templates.Count; i++)
+            {
+                byte[] buffer = encoder.GetBytes(templates[i].ToString() + '\n');
+                stream.Write(buffer, 0, buffer.Length);
+            }
+            stream.Flush();
+            stream.Dispose();
         }
 
         //this is a seperate thread.
@@ -158,6 +192,7 @@ namespace BecomeJPEG
                 {
                     frameLagRandom = 0;
                     frameLagTime = 0;
+                    continue;
                 }
 
                 //set command is next - it requires 3 params.
@@ -171,16 +206,42 @@ namespace BecomeJPEG
                         frameLagTime = int.Parse(inputArgs[2]);
                     else if (inputArgs[1] == "lagrandom")
                         frameLagRandom = int.Parse(inputArgs[2]);
+                    continue;
                 }
 
                 //template command - requires 3 params.
-                if (inputArgs[0] == "template" && inputArgs.Length == 3)
+                if (inputArgs[0] == "template" && inputArgs.Length >= 2)
                 {
-                    if (inputArgs[1] == "apply")
-                        ApplyTemplate(inputArgs[2]);
-                    else if (inputArgs[1] == "save")
-                        SaveTemplate(inputArgs[2]);
+                    if (inputArgs.Length == 3)
+                    {
+                        if (inputArgs[1] == "apply")
+                            ApplyTemplate(inputArgs[2]);
+                        else if (inputArgs[1] == "save")
+                            SaveTemplate(inputArgs[2]);
+                        else if (inputArgs[1] == "delete")
+                            DeleteTemplate(inputArgs[2]);
+                    }
+                    else if (inputArgs.Length == 2)
+                    {
+                        if (inputArgs[1] == "list")
+                            ListTemplates();
+                    }
+                    continue;
                 }
+            }
+        }
+
+        private static void ListTemplates()
+        {
+            if(templates.Count == 0)
+            {
+                Console.WriteLine("- There are no templates.");
+            }
+            else
+            {
+                Console.WriteLine("Available templates:");
+                foreach (var template in templates)
+                    Console.WriteLine($"- {template.templateName}");
             }
         }
 
@@ -199,7 +260,8 @@ namespace BecomeJPEG
             template.frameLagRandom = frameLagRandom;
             template.frameLagTime = frameLagTime;
             template.compressionQuality = CompressionQuality;
-            //TODO: write templates to a file.
+            //write templates to a file.
+            SaveTemplatesToDrive();
         }
 
         //applies a template by name.
@@ -212,6 +274,18 @@ namespace BecomeJPEG
                 frameLagRandom = foundTemplate.frameLagRandom;
                 frameLagTime = foundTemplate.frameLagTime;
                 frameDropChance = foundTemplate.frameDropChance;
+            }
+        }
+
+        //Removes a named template if it exists.
+        private static void DeleteTemplate(string name)
+        {
+            QualityTemplate foundTemplate = templates.Find(x => x.templateName == name);
+            if (foundTemplate != null)
+            {
+                templates.Remove(foundTemplate);
+                //write templates to a file.
+                SaveTemplatesToDrive();
             }
         }
     }
