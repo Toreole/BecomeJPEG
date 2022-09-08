@@ -79,6 +79,7 @@ namespace BecomeJPEG
                 capture.Retrieve(frame);
                 
                 //jpeg compress the hell out of it.
+                //this is the only source of garbage in this event, and I dont think there is a way to avoid it.
                 byte[] data = frame.ToJpegData(CompressionQuality);
                 
                 //read the JPEG back into frameMatrix.

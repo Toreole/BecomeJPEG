@@ -17,3 +17,8 @@ But there's several commands you can use inside the console:
 | template save [name] | Saves the current settings as a template with the specified name. Will override existing templates of that name. |
 | template delete [name] | Deletes the template [name] |
 | template list | Shows a list of available templates. |
+
+### Examples 
+
+Here's a view of the default supplied "worst" quality template. Input is given by "Creative Live! Cam Sync 1080p V2":
+[Thats a lot of compression](images/worstTemplateOut.gif)
