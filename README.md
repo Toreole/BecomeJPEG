@@ -21,4 +21,4 @@ But there's several commands you can use inside the console:
 ### Examples 
 
 Here's a view of the default supplied "worst" quality template. Input is given by "Creative Live! Cam Sync 1080p V2":
-[Thats a lot of compression](images/worstTemplateOut.gif)
+![Thats a lot of compression](images/worstTemplateOut.gif)
