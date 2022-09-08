@@ -3,6 +3,8 @@ using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System.Threading;
+using System.IO;
+using System.Collections.Generic;
 
 namespace BecomeJPEG
 {
@@ -16,6 +18,10 @@ namespace BecomeJPEG
         static volatile int frameLagRandom = 400;
         //readonly windowName.
         static readonly string windowName = "BecomeJPEG Preview";
+
+        //list of templates.
+        static List<QualityTemplate> templates = null;
+
         //Property that automatically clamps the quality between 0 and 100.
         static int CompressionQuality 
         { 
@@ -30,6 +36,9 @@ namespace BecomeJPEG
         //entry point. you know how it is.
         static void Main(string[] args)
         {
+            //Initialize the template list.
+            LoadTemplatesFromDrive();
+
             //create the window.
             CvInvoke.NamedWindow(windowName);
           
@@ -50,8 +59,8 @@ namespace BecomeJPEG
             {
                 long currentFrameMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 
-                //skip frame if currently in "lag" time.
-                if (nextFrameMillis > currentFrameMillis) 
+                //skip frame if currently in "lag" time.    -when the lagtimes have been set to 0, this should be skipped.
+                if (nextFrameMillis > currentFrameMillis && (frameLagRandom | frameLagTime) != 0) 
                     return;
                 //chance for frame to be dropped is checked before anything else.
                 if (rng.NextDouble() <= frameDropChance)
@@ -93,11 +102,32 @@ namespace BecomeJPEG
             CvInvoke.DestroyWindow(windowName);
         }
 
+        private static void LoadTemplatesFromDrive()
+        {
+            if (File.Exists("templates.txt") == false)
+            {
+                //default templates.
+                templates = new List<QualityTemplate>()
+                {
+                    new QualityTemplate("high", 0, 100, 0, 0),
+                    new QualityTemplate("worst", 0.5f, 0, 100, 100),
+                    new QualityTemplate("medium", 0.2f, 4, 10, 20)
+                };
+            }
+            else
+            {
+                FileStream stream = File.OpenRead("templates.txt");
+                byte[] buffer = new byte[stream.Length];
+                //read the entire file.
+                stream.Read(buffer, 0, (int)stream.Length);
+            }
+        }
+
         //this is a seperate thread.
         private static void DoConsoleCommands()
         {
             //receive input into these two local variables.
-            string input = "";
+            string input = null;
             string[] inputArgs;
             //only exit point is the "quit" command. 
             while(true)
@@ -109,18 +139,29 @@ namespace BecomeJPEG
                 //split the line into individual arguments
                 inputArgs = input.Split(' ');
 
+                //convert all arguments to lower.
+                for (int i = 0; i < inputArgs.Length; ++i)
+                    inputArgs[i] = inputArgs[i].ToLower();
+
                 //shouldnt do anything if input is empty or first argument is blank.
                 if (inputArgs.Length <= 0 || string.IsNullOrWhiteSpace(inputArgs[0]))
                     continue;
 
                 //quit command is checked first.
-                if (inputArgs[0].ToLower() == "quit")
+                if (inputArgs[0] == "quit")
                 {
                     return;
                 }
 
+                //stoplag command - just to break out of long lag times when you set them before.
+                if (inputArgs[0] == "stoplag")
+                {
+                    frameLagRandom = 0;
+                    frameLagTime = 0;
+                }
+
                 //set command is next - it requires 3 params.
-                if (inputArgs[0].ToLower() == "set" && inputArgs.Length == 3)
+                if (inputArgs[0] == "set" && inputArgs.Length == 3)
                 {
                     if (inputArgs[1] == "droprate")
                         frameDropChance = float.Parse(inputArgs[2]) / 100f; //divide by 100, so 100 means 100%, 10 means 10%, etc.
@@ -131,6 +172,46 @@ namespace BecomeJPEG
                     else if (inputArgs[1] == "lagrandom")
                         frameLagRandom = int.Parse(inputArgs[2]);
                 }
+
+                //template command - requires 3 params.
+                if (inputArgs[0] == "template" && inputArgs.Length == 3)
+                {
+                    if (inputArgs[1] == "apply")
+                        ApplyTemplate(inputArgs[2]);
+                    else if (inputArgs[1] == "save")
+                        SaveTemplate(inputArgs[2]);
+                }
+            }
+        }
+
+        //saves a template with the provided name. if a template with that name already exists, override it.
+        private static void SaveTemplate(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return;
+            QualityTemplate template = templates.Find(x => x.templateName == name);
+            if (template == null)
+            {
+                template = new QualityTemplate(name);
+                templates.Add(template);
+            }
+            template.frameDropChance = frameDropChance;
+            template.frameLagRandom = frameLagRandom;
+            template.frameLagTime = frameLagTime;
+            template.compressionQuality = CompressionQuality;
+            //TODO: write templates to a file.
+        }
+
+        //applies a template by name.
+        private static void ApplyTemplate(string name)
+        {
+            QualityTemplate foundTemplate = templates.Find(x => x.templateName == name);
+            if(foundTemplate != null)
+            {
+                CompressionQuality = foundTemplate.compressionQuality;
+                frameLagRandom = foundTemplate.frameLagRandom;
+                frameLagTime = foundTemplate.frameLagTime;
+                frameDropChance = foundTemplate.frameDropChance;
             }
         }
     }
