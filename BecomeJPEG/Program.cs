@@ -12,6 +12,8 @@ namespace BecomeJPEG
         static Random rng = new Random();
         static volatile float frameDropChance = 0.85f;
         static volatile int compressionQuality = 0;
+        static volatile int frameLagTime = 100;
+        static volatile int frameLagRandom = 400;
         //readonly windowName.
         static readonly string windowName = "BecomeJPEG Preview";
         //Property that automatically clamps the quality between 0 and 100.
@@ -40,12 +42,24 @@ namespace BecomeJPEG
             //the frameMatrix is needed to read the jpeg data into a displayable image again.
             Mat frameMatrix = new Mat(capture.Width, capture.Height, DepthType.Cv8U, 3);
 
+            // first frame should always show immediately.
+            long nextFrameMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
             //subscribe to the ImageGrabbed event. This will follow the device's framerate.
             capture.ImageGrabbed += new EventHandler(delegate (object sender, EventArgs e)
             {
+                long currentFrameMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                
+                //skip frame if currently in "lag" time.
+                if (nextFrameMillis > currentFrameMillis) 
+                    return;
                 //chance for frame to be dropped is checked before anything else.
                 if (rng.NextDouble() <= frameDropChance)
+                {
+                    //lag is started by skipping frames.
+                    nextFrameMillis = currentFrameMillis + frameLagTime + rng.Next(frameLagRandom);
                     return;
+                }
                 //retrieve the grabbed frame data.
                 capture.Retrieve(frame);
                 
@@ -110,8 +124,12 @@ namespace BecomeJPEG
                 {
                     if (inputArgs[1] == "droprate")
                         frameDropChance = float.Parse(inputArgs[2]) / 100f; //divide by 100, so 100 means 100%, 10 means 10%, etc.
-                    if (inputArgs[1] == "quality")
+                    else if (inputArgs[1] == "quality")
                         CompressionQuality = int.Parse(inputArgs[2]); //can be set directly to Property because it handles Clamping.
+                    else if (inputArgs[1] == "lagtime")
+                        frameLagTime = int.Parse(inputArgs[2]);
+                    else if (inputArgs[1] == "lagrandom")
+                        frameLagRandom = int.Parse(inputArgs[2]);
                 }
             }
         }
