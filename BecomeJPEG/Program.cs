@@ -46,11 +46,17 @@ namespace BecomeJPEG
         //entry point. you know how it is.
         static void Main(string[] args)
         {
+            SettingsPanel mWindow = new SettingsPanel();
+            mWindow.ShowDialog();
+            mWindow.Enabled = true;
+
+            return; //VERY TEMPORARY
             //Initialize the template list.
             LoadTemplatesFromDrive();
 
             DsDevice[] devices = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
 
+            //--TODO: Select device.
             Console.WriteLine("Video Input Devices found:");
             foreach(var device in devices)
             {
@@ -67,6 +73,7 @@ namespace BecomeJPEG
             //create the videocapture. this will default to the first installed device.
             VideoCapture capture = new VideoCapture();
             
+            //--TODO: capture resolution configurable by user.
             capture.SetCaptureProperty(CapProp.FrameWidth, 640);
             capture.SetCaptureProperty(CapProp.FrameHeight, 360);
 
