@@ -7,6 +7,10 @@ using System.IO;
 using System.Collections.Generic;
 
 using Encoding = System.Text.Encoding;
+using Emgu.CV.Util;
+
+//from the DirectShowLib-2005.dll
+using DirectShowLib;
 
 namespace BecomeJPEG
 {
@@ -16,10 +20,10 @@ namespace BecomeJPEG
 
         //settings and and a Random instance that should just be accessible.
         static Random rng = new Random();
-        static volatile float frameDropChance = 0.85f;
-        static volatile int compressionQuality = 0;
-        static volatile int frameLagTime = 100;
-        static volatile int frameLagRandom = 400;
+        static float frameDropChance = 0.85f;
+        static int compressionQuality = 0;
+        static int frameLagTime = 100;
+        static int frameLagRandom = 400;
         //readonly windowName.
         static readonly string windowName = "BecomeJPEG Preview";
 
@@ -45,11 +49,28 @@ namespace BecomeJPEG
             //Initialize the template list.
             LoadTemplatesFromDrive();
 
+            DsDevice[] devices = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
+
+            Console.WriteLine("Video Input Devices found:");
+            foreach(var device in devices)
+            {
+                Console.WriteLine(device.Name + " - " +  device.GetPropBagValue("DevicePath"));
+            }
+            Console.WriteLine("---------");
+
+            Console.ReadLine();
+            return; //TEMPORARY RETURN; DONT WANT ALL THAT OTHER STUFF RIGHT NOW
+
             //create the window.
             CvInvoke.NamedWindow(windowName);
-          
+
             //create the videocapture. this will default to the first installed device.
             VideoCapture capture = new VideoCapture();
+            
+            capture.SetCaptureProperty(CapProp.FrameWidth, 640);
+            capture.SetCaptureProperty(CapProp.FrameHeight, 360);
+
+            Console.WriteLine($"Capture size: {capture.Width}x{capture.Height}");
 
             //defining both of these up here avoids a LOT of garbage.
             //frame is required for compressing the data into Jpeg format.
