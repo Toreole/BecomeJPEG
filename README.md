@@ -2,24 +2,22 @@
 A tiny project powered by EgmuCV (the .NET OpenCV wrapper) to capture a webcam video stream, and JPEG compress and preview it in real time.
 
 ### Features
-On startup you will see two windows, one is the preview of the camera, the other is the console.
-You can't do much with the preview window other than move it around.
-But there's several commands you can use inside the console:
 
-| Command | Description |
-| --- | --- |
-| quit | quits the application. |
-| set quality 0-100 | Sets the target quality of the JPEG compression. 0 is most compressed, 100 is uncompressed. The quality is an integer. |
-| set droprate 0-100 | Sets the % chance for the application to skip a frame of the webcam. 0 is none are skipped, 100 is all are skipped (essentially a freeze frame). Droprate is a floating point number. Note: depending on your region you may need to write "5.5" or "5,5" for it to use the correct value. | 
-| set lagtime [millis] | Sets the fixed time for a freeze frame (dropped/skipped frame) to last. millis is an integer. |
-| set lagrandom [millis] | Sets the randomized additional time for a freeze frame to last. millis is the exclusive upper bounds of the random range, and an integer. The duration for a freeze frame is given in lagtime + random(0, lagrandom]. If both are 0, there will be no additional lag on top of the skipped frame. |
-| template apply [name] | Applies the template [name] settings. Templates are stored in a templates.txt file. By default there will be "worst", "medium", and "high". |
-| template save [name] | Saves the current settings as a template with the specified name. Will override existing templates of that name. |
-| template delete [name] | Deletes the template [name] |
-| template list | Shows a list of available templates. |
-| stoplag | Resets lagtime and lagrandom to 0, causing the next frame from the camera to update the preview without having to wait for the lagtime offset. Useful when you set lagtime/lagrandom to a very high value by accident. |
+Upon startup, you will be presented with the Settings Panel. This is a small comprehensive window to configure the settings of the application even before it first activates your webcam.
+
+Here's a gif showing that changing templates has become much easier as opposed to how it was in the console (no more typing, just double click one!).
+![Changing Templates in GUI](images/change_template.gif)
+As before, saving a template with the active settings will override old templates of the same name.
+
+The GUI also features a small black textbox for logging. The same messages will also be saved in a log.txt next to the application (similarly to the templates.txt).
 
 ### Examples 
 
 Here's a view of the default supplied "worst" quality template. Input is given by "Creative Live! Cam Sync 1080p V2":
 ![Thats a lot of compression](images/worstTemplateOut.gif)
+
+### Notes
+
+Depending on your CPU and the target resolution, it will demand a lot. So keeping the capture resolution low is recommended (configuration of this is a planned feature ATM).
+
+The Settings Panel is made with basic WinForms, just because i don't really plan on making it super fancy, it should just get things done for now. It can be improved later if need be.

@@ -12,19 +12,19 @@ namespace BecomeJPEG
     {
         private const string templateFile = "templates.txt";
 
-        //settings and and a Random instance that should just be accessible.
-        private static readonly Random rng = new Random();
+        //active settings.
         internal static float frameDropChance = 0.85f;
         internal static int compressionQuality = 0;
         internal static int frameLagTime = 100;
         internal static int frameLagRandom = 400;
-        //readonly windowName.
-        internal static readonly string windowName = "BecomeJPEG Preview";
+
+        //window name for the EgmuCV.
+        internal const string windowName = "BecomeJPEG Preview";
 
         private static readonly Encoding encoder = Encoding.UTF8;
 
         //list of templates.
-        internal static List<QualityTemplate> templates = null;
+        private static List<QualityTemplate> templates = null;
 
         //Property that automatically clamps the quality between 0 and 100.
         internal static int CompressionQuality
@@ -102,6 +102,11 @@ namespace BecomeJPEG
             {
                 template = new QualityTemplate(name);
                 templates.Add(template);
+                Logger.LogLine($"Overriding Template \"{name}\" with new values.");
+            } 
+            else
+            {
+                Logger.LogLine($"Created new Template \"{name}\".");
             }
             template.frameDropChance = frameDropChance;
             template.frameLagRandom = frameLagRandom;
@@ -121,14 +126,20 @@ namespace BecomeJPEG
                 frameLagRandom = foundTemplate.frameLagRandom;
                 frameLagTime = foundTemplate.frameLagTime;
                 frameDropChance = foundTemplate.frameDropChance;
+                Logger.LogLine($"Applied Template \"{name}\".");
             }
             else
             {
-                Logger.LogLine($"Could not find Template \"{name}\"");
+                Logger.LogLine($"Could not find Template \"{name}\".");
             }
         }
 
-        internal static void ApplyTemplate(int index)
+        /// <summary>
+        /// Apply a template given its index.
+        /// </summary>
+        /// <param name="index">the index of the template in the collection</param>
+        /// <returns>A SReadonlyQualityTemplate that has the values of the applied Template.</returns>
+        internal static SReadonlyQualityTemplate ApplyTemplate(int index)
         {
             if (index >= 0 && index < templates.Count)
             {
@@ -137,18 +148,23 @@ namespace BecomeJPEG
                 frameLagRandom = template.frameLagRandom;
                 frameLagTime = template.frameLagTime;
                 frameDropChance = template.frameDropChance;
-                Logger.LogLine($"Applied Template \"{template.templateName}\"");
+
+                Logger.LogLine($"Applied Template \"{template.templateName}\".");
+                //return readonly copies of the template values.
+                return new SReadonlyQualityTemplate(template);
             }
             else
             {
                 if (templates != null)
-                    Logger.LogLine($"Invalid ApplyTemplate call. index: {index}");
+                    Logger.LogLine($"Invalid ApplyTemplate call. index: {index}.");
                 else
                     Logger.LogLine("Templates List null.");
+                return default;
             }
         }
 
         //Removes a named template if it exists.
+        //obsolete: should delete via index instead now.
         internal static void DeleteTemplate(string name)
         {
             QualityTemplate foundTemplate = templates.Find(x => x.templateName == name);
@@ -157,7 +173,7 @@ namespace BecomeJPEG
                 templates.Remove(foundTemplate);
                 //write templates to a file.
                 SaveTemplatesToDrive();
-                Logger.LogLine($"Deleted template \"{foundTemplate.templateName}\"");
+                Logger.LogLine($"Deleted template \"{foundTemplate.templateName}\".");
             }
         }
 
@@ -168,8 +184,10 @@ namespace BecomeJPEG
                 QualityTemplate template = templates[index];
                 templates.RemoveAt(index);
                 SaveTemplatesToDrive();
-                Logger.LogLine($"Deleted template \"{template.templateName}\"");
+                Logger.LogLine($"Deleted template \"{template.templateName}\".");
             }
         }
+
+        internal static IEnumerable<QualityTemplate> IterateTemplates() => templates;
     }
 }

@@ -18,6 +18,8 @@ namespace BecomeJPEG
 
         private string templateName = "";
 
+        private const string number_0_100_regex = "^(100|[0-9]?[0-9])$";
+
         public SettingsPanel()
         {
             InitializeComponent();
@@ -41,13 +43,13 @@ namespace BecomeJPEG
         //quality needs to be a integer between 0 and 100
         private void QualityInput_TextChanged(object sender, EventArgs e)
         {
-
+            
         }
 
         //templatename is the name of the current template, this will not really do anything. the important part is validation.
         private void TemplateName_TextChanged(object sender, EventArgs e)
         {
-
+            templateName = TemplateNameInput.Text;
         }
 
         //droprate should also just be an integer from 0 to 100, doesnt make much difference for it to be a float.
@@ -86,7 +88,19 @@ namespace BecomeJPEG
         private void TemplateList_DoubleClick(object sender, MouseEventArgs e)
         {
             int index = TemplateList.SelectedIndex;
-            Settings.ApplyTemplate(index);
+            SReadonlyQualityTemplate qualitySettings = Settings.ApplyTemplate(index);
+            //check if the qualitySettings struct is valid.
+            if(qualitySettings.isValid)
+            {
+                //update all textboxes.
+                this.TemplateNameInput.Text = qualitySettings.name;
+                this.templateName           = qualitySettings.name;
+                this.LagrandomInput.Text    = qualitySettings.lagRandom.ToString();
+                this.LagtimeInput.Text      = qualitySettings.lagTime.ToString();
+                this.DroprateInput.Text     = qualitySettings.dropChance.ToString("0.0");
+                this.QualityInput.Text      = qualitySettings.quality.ToString();
+            }
+
         }
 
         //"Add Template" should overwrite the existing template with the same name, or create a new one.
@@ -115,7 +129,7 @@ namespace BecomeJPEG
             }
             var items = TemplateList.Items;
             items.Clear();
-            foreach (var template in Settings.templates)
+            foreach (var template in Settings.IterateTemplates())
             {
                 items.Add(template.templateName);
             }

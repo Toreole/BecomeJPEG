@@ -59,4 +59,28 @@ namespace BecomeJPEG
             return t;
         }
     }
+
+    /// <summary>
+    /// A shortlived readonly struct that holds the values of a QualityTemplate.
+    /// Useful for events or small Get methods that should not even get the chance to modify the original QualityTemplate.
+    /// </summary>
+    internal readonly struct SReadonlyQualityTemplate
+    {
+        internal readonly int quality;
+        internal readonly int lagTime;
+        internal readonly int lagRandom;
+        internal readonly float dropChance;
+        internal readonly bool isValid;
+        internal readonly string name;
+
+        internal SReadonlyQualityTemplate(QualityTemplate qt)
+        {
+            quality = qt.compressionQuality;
+            lagTime = qt.frameLagTime;
+            lagRandom = qt.frameLagRandom;
+            dropChance = qt.frameDropChance;
+            isValid = true;
+            name = qt.templateName;
+        }
+    }
 }
