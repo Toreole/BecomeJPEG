@@ -44,6 +44,7 @@
             this.TemplateAddButton = new System.Windows.Forms.Button();
             this.TemplateDelete = new System.Windows.Forms.Button();
             this.TemplateLabel = new System.Windows.Forms.Label();
+            this.LogText = new System.Windows.Forms.TextBox();
             this.TemplatePanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -160,6 +161,7 @@
             this.TemplateList.Size = new System.Drawing.Size(197, 134);
             this.TemplateList.TabIndex = 12;
             this.TemplateList.SelectedIndexChanged += new System.EventHandler(this.TemplateList_SelectedIndexChanged);
+            this.TemplateList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TemplateList_DoubleClick);
             // 
             // TemplatePanel
             // 
@@ -203,11 +205,28 @@
             this.TemplateLabel.TabIndex = 13;
             this.TemplateLabel.Text = "Available Templates";
             // 
+            // LogText
+            // 
+            this.LogText.BackColor = System.Drawing.SystemColors.InactiveCaptionText;
+            this.LogText.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LogText.ForeColor = System.Drawing.SystemColors.Window;
+            this.LogText.Location = new System.Drawing.Point(12, 228);
+            this.LogText.MaximumSize = new System.Drawing.Size(420, 100);
+            this.LogText.MaxLength = 800;
+            this.LogText.MinimumSize = new System.Drawing.Size(420, 70);
+            this.LogText.Multiline = true;
+            this.LogText.Name = "LogText";
+            this.LogText.ReadOnly = true;
+            this.LogText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.LogText.Size = new System.Drawing.Size(420, 82);
+            this.LogText.TabIndex = 14;
+            // 
             // SettingsPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(438, 231);
+            this.ClientSize = new System.Drawing.Size(438, 314);
+            this.Controls.Add(this.LogText);
             this.Controls.Add(this.TemplatePanel);
             this.Controls.Add(this.LagrandomLabel);
             this.Controls.Add(this.LagrandomInput);
@@ -249,5 +268,6 @@
         private System.Windows.Forms.Button TemplateAddButton;
         private System.Windows.Forms.Button TemplateDelete;
         private System.Windows.Forms.Label TemplateLabel;
+        private System.Windows.Forms.TextBox LogText;
     }
 }
