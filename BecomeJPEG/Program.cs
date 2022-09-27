@@ -23,7 +23,8 @@ namespace BecomeJPEG
             Settings.LoadTemplatesFromDrive();
 
             SettingsPanel mWindow = new SettingsPanel();
-            mWindow.Enabled = true;
+            
+            //ShowDialog essentially waits until after the form has been closed.
             mWindow.ShowDialog();
 
             //ensure that everything is closed properly.

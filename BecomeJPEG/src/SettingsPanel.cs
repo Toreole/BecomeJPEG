@@ -14,9 +14,28 @@ namespace BecomeJPEG
     //--TODO: basically all of this. WinForms. See Design panel.
     public partial class SettingsPanel : Form
     {
+        private int selectedTemplateIndex = -1;
+
+        private string templateName = "";
+
         public SettingsPanel()
         {
             InitializeComponent();
+        }
+
+        //set up the panel upon loading it.
+        private void SettingsPanel_Load(object sender, EventArgs e)
+        {
+            //double check + cast
+            if (sender is SettingsPanel panel)
+            {
+                //Setup the template list.
+                RefreshTemplateList();
+
+                //set up logging.
+                Logger.Init(this.LogText);
+
+            }
         }
 
         //quality needs to be a integer between 0 and 100
@@ -54,52 +73,20 @@ namespace BecomeJPEG
         //stop => shut down the jpeg window and stop camera frame grabbing.
         private void StartStopButton_Click(object sender, EventArgs e)
         {
-            if(sender is Button button)
-            {
-                button.Text = "Stop";
-            }
-        }
-
-        //set up the panel upon loading it.
-        private void SettingsPanel_Load(object sender, EventArgs e)
-        {
-            //double check + cast
-            if(sender is SettingsPanel panel)
-            {
-                //find the template list and set it up with the options from the stored templates.
-                var templateList = panel.Controls.Find("TemplateList", true).FirstOrDefault();
-                if(templateList != null && templateList is ListBox list)
-                {
-                    list.Items.Clear();
-                    foreach(var template in Settings.templates)
-                    {
-                        list.Items.Add(template.templateName);
-                    }
-                }
-
-                //set up logging.
-                var logTextBox = panel.Controls.Find("LogText", true).FirstOrDefault();
-                if(logTextBox != null && logTextBox is TextBox textBox)
-                {
-                    Logger.Init(textBox);
-                }
-            }
+            StartStopButton.Text = "Stop";
         }
 
         //the index should just be cached in here
         private void TemplateList_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            selectedTemplateIndex = TemplateList.SelectedIndex;
         }
 
         //double clicking a template in the list should cause a change in template.
         private void TemplateList_DoubleClick(object sender, MouseEventArgs e)
         {
-            if(sender is ListBox list)
-            {
-                int index = list.SelectedIndex;
-                Settings.ApplyTemplate(index);
-            }
+            int index = TemplateList.SelectedIndex;
+            Settings.ApplyTemplate(index);
         }
 
         //"Add Template" should overwrite the existing template with the same name, or create a new one.
@@ -111,7 +98,27 @@ namespace BecomeJPEG
         //"Template Delete" should delete the selected template (given by its index)
         private void TemplateDelete_Click(object sender, EventArgs e)
         {
+            Settings.DeleteTemplate(selectedTemplateIndex);
+            RefreshTemplateList();
+        }
 
+        /// <summary>
+        /// Completely refreshes the TemplateList by repopulating it.
+        /// </summary>
+        //seek for a way to improve this.
+        private void RefreshTemplateList()
+        {
+            if(TemplateList == null)
+            {
+                Logger.LogLine("TemplateList unavailable.");
+                return;
+            }
+            var items = TemplateList.Items;
+            items.Clear();
+            foreach (var template in Settings.templates)
+            {
+                items.Add(template.templateName);
+            }
         }
     }
 }

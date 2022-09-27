@@ -13,7 +13,7 @@ namespace BecomeJPEG
         private const string templateFile = "templates.txt";
 
         //settings and and a Random instance that should just be accessible.
-        private static Random rng = new Random();
+        private static readonly Random rng = new Random();
         internal static float frameDropChance = 0.85f;
         internal static int compressionQuality = 0;
         internal static int frameLagTime = 100;
@@ -39,6 +39,9 @@ namespace BecomeJPEG
             }
         }
 
+        /// <summary>
+        /// Loads templates from the templates.txt file if possible. Otherwise creates a default list.
+        /// </summary>
         internal static void LoadTemplatesFromDrive()
         {
             if (File.Exists(templateFile) == false)
@@ -86,6 +89,7 @@ namespace BecomeJPEG
             }
             stream.Flush();
             stream.Dispose();
+            Logger.LogLine("Saved Templates to file.");
         }
 
         //saves a template with the provided name. if a template with that name already exists, override it.
@@ -118,6 +122,10 @@ namespace BecomeJPEG
                 frameLagTime = foundTemplate.frameLagTime;
                 frameDropChance = foundTemplate.frameDropChance;
             }
+            else
+            {
+                Logger.LogLine($"Could not find Template \"{name}\"");
+            }
         }
 
         internal static void ApplyTemplate(int index)
@@ -133,7 +141,10 @@ namespace BecomeJPEG
             }
             else
             {
-                Logger.LogLine($"Invalid ApplyTemplate call. index: {index}");
+                if (templates != null)
+                    Logger.LogLine($"Invalid ApplyTemplate call. index: {index}");
+                else
+                    Logger.LogLine("Templates List null.");
             }
         }
 
@@ -146,6 +157,18 @@ namespace BecomeJPEG
                 templates.Remove(foundTemplate);
                 //write templates to a file.
                 SaveTemplatesToDrive();
+                Logger.LogLine($"Deleted template \"{foundTemplate.templateName}\"");
+            }
+        }
+
+        internal static void DeleteTemplate(int index)
+        {
+            if (index >= 0 && index < templates.Count)
+            {
+                QualityTemplate template = templates[index];
+                templates.RemoveAt(index);
+                SaveTemplatesToDrive();
+                Logger.LogLine($"Deleted template \"{template.templateName}\"");
             }
         }
     }

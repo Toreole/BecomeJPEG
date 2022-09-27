@@ -1,4 +1,5 @@
 ﻿using System;
+using static BecomeJPEG.Util;
 
 namespace BecomeJPEG
 {
@@ -51,26 +52,11 @@ namespace BecomeJPEG
             if (args.Length == 0 || string.IsNullOrWhiteSpace(args[0]))
                 return null;
             QualityTemplate t = new QualityTemplate(args[0]);
-            TryParseFloatFrom(ref t.frameDropChance, args, 1, 0f);
-            TryParseIntFrom(ref t.compressionQuality, args, 2, 100);
-            TryParseIntFrom(ref t.frameLagTime, args, 3, 0);
-            TryParseIntFrom(ref t.frameLagRandom, args, 4, 0);
+            ParseFloatFromStrArr(ref t.frameDropChance, args, 1, 0f);
+            ParseIntFromStrArr(ref t.compressionQuality, args, 2, 100);
+            ParseIntFromStrArr(ref t.frameLagTime, args, 3, 0);
+            ParseIntFromStrArr(ref t.frameLagRandom, args, 4, 0);
             return t;
-        }
-
-        private static void TryParseIntFrom(ref int i, string[] arr, int index, int defaultValue)
-        {
-            if (index < arr.Length)
-                i = int.Parse(arr[index]);
-            else
-                i = defaultValue;
-        }
-        private static void TryParseFloatFrom(ref float i, string[] arr, int index, float defaultValue)
-        {
-            if (index < arr.Length)
-                i = float.Parse(arr[index]);
-            else
-                i = defaultValue;
         }
     }
 }
