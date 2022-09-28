@@ -102,6 +102,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\JpegCamWindow.cs" />
     <Compile Include="src\Logger.cs" />
     <Compile Include="src\Settings.cs" />
     <Compile Include="src\SettingsPanel.cs">

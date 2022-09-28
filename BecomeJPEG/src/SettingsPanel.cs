@@ -1,8 +1,9 @@
-﻿using BecomeJPEG.src;
-using DirectShowLib;
+﻿using DirectShowLib;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BecomeJPEG
@@ -18,6 +19,9 @@ namespace BecomeJPEG
         private readonly Regex int999_Regex = new Regex("(0|([1-9][0-9]{0,2}))");
         //Regex that validates integers from 0-9999
         private readonly Regex int9999_Regex = new Regex("(0|([1-9][0-9]{0,3}))");
+
+        private JpegCamWindow cameraWindow;
+        private Task cameraWindowTask;
 
         public SettingsPanel()
         {
@@ -42,11 +46,21 @@ namespace BecomeJPEG
                 //Fetch list of devices
                 DsDevice[] devices = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
 
-                //--TODO: Select device.
-                Logger.LogLine("Video Input Devices found:");
-                foreach (var device in devices)
+                //requires at least one device to be present.
+                if(devices.Length == 0)
                 {
-                    Logger.LogLine("> " + device.Name);
+                    Logger.LogLine("Could not find any Camera Devices.");
+                }
+                else
+                {
+                    var deviceList = this.DeviceSelection.Items;
+                    deviceList.Clear();
+                    //put em all in the list, and dispose of them
+                    for(int i = 0; i < devices.Length; i++)
+                    {
+                        deviceList.Add(devices[i].Name);
+                        devices[i].Dispose();
+                    }
                 }
             }
         }
@@ -120,7 +134,27 @@ namespace BecomeJPEG
         //stop => shut down the jpeg window and stop camera frame grabbing.
         private void StartStopButton_Click(object sender, EventArgs e)
         {
-            StartStopButton.Text = StartStopButton.Text == "Stop"?  "Start":"Stop";
+            if(cameraWindow == null || cameraWindow.IsActive == false)
+            {
+                cameraWindow = new JpegCamWindow(0);
+                cameraWindowTask = cameraWindow.Run();
+                //dispose once it finished running.
+                cameraWindowTask.GetAwaiter().OnCompleted(DisposeTask);
+                StartStopButton.Text = "Stop";
+
+                void DisposeTask()
+                {
+                    cameraWindowTask.Dispose();
+                    cameraWindowTask = null;
+                    StartStopButton.Enabled = true;
+                }
+            }
+            else
+            {
+                cameraWindow.IsActive = false;
+                StartStopButton.Text = "Start";
+                StartStopButton.Enabled = false;
+            }
         }
 
         //the index should just be cached in here
@@ -243,6 +277,5 @@ namespace BecomeJPEG
             if(e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
                 this.ActiveControl = null;
         }
-
     }
 }

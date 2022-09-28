@@ -45,14 +45,16 @@
             this.TemplateDelete = new System.Windows.Forms.Button();
             this.TemplateLabel = new System.Windows.Forms.Label();
             this.LogText = new System.Windows.Forms.TextBox();
+            this.DeviceSelection = new System.Windows.Forms.ComboBox();
+            this.DeviceSelectionLabel = new System.Windows.Forms.Label();
             this.TemplatePanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // StartStopButton
             // 
-            this.StartStopButton.Location = new System.Drawing.Point(12, 181);
+            this.StartStopButton.Location = new System.Drawing.Point(12, 200);
             this.StartStopButton.Name = "StartStopButton";
-            this.StartStopButton.Size = new System.Drawing.Size(151, 44);
+            this.StartStopButton.Size = new System.Drawing.Size(209, 25);
             this.StartStopButton.TabIndex = 0;
             this.StartStopButton.Text = "Start";
             this.StartStopButton.UseVisualStyleBackColor = true;
@@ -223,11 +225,31 @@
             this.LogText.Size = new System.Drawing.Size(420, 82);
             this.LogText.TabIndex = 14;
             // 
+            // DeviceSelection
+            // 
+            this.DeviceSelection.FormattingEnabled = true;
+            this.DeviceSelection.Location = new System.Drawing.Point(12, 170);
+            this.DeviceSelection.Name = "DeviceSelection";
+            this.DeviceSelection.Size = new System.Drawing.Size(209, 21);
+            this.DeviceSelection.TabIndex = 16;
+            this.DeviceSelection.Text = "- Select Device -";
+            // 
+            // DeviceSelectionLabel
+            // 
+            this.DeviceSelectionLabel.AutoSize = true;
+            this.DeviceSelectionLabel.Location = new System.Drawing.Point(9, 154);
+            this.DeviceSelectionLabel.Name = "DeviceSelectionLabel";
+            this.DeviceSelectionLabel.Size = new System.Drawing.Size(78, 13);
+            this.DeviceSelectionLabel.TabIndex = 17;
+            this.DeviceSelectionLabel.Text = "Target Device:";
+            // 
             // SettingsPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(438, 314);
+            this.Controls.Add(this.DeviceSelectionLabel);
+            this.Controls.Add(this.DeviceSelection);
             this.Controls.Add(this.LogText);
             this.Controls.Add(this.TemplatePanel);
             this.Controls.Add(this.LagrandomLabel);
@@ -271,5 +293,7 @@
         private System.Windows.Forms.Button TemplateDelete;
         private System.Windows.Forms.Label TemplateLabel;
         private System.Windows.Forms.TextBox LogText;
+        private System.Windows.Forms.ComboBox DeviceSelection;
+        private System.Windows.Forms.Label DeviceSelectionLabel;
     }
 }
