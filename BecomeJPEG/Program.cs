@@ -18,7 +18,7 @@ namespace BecomeJPEG
     internal class Program
     {
         //entry point. you know how it is.
-        static void Main(string[] args)
+        static void Main()
         {
             Settings.LoadTemplatesFromDrive();
 
@@ -77,7 +77,7 @@ namespace BecomeJPEG
                 if (nextFrameMillis > currentFrameMillis && (Settings.frameLagRandom | Settings.frameLagTime) != 0) 
                     return;
                 //chance for frame to be dropped is checked before anything else.
-                if (rng.NextDouble() <= Settings.frameDropChance)
+                if (rng.Next(100) <= Settings.frameDropChance)
                 {
                     //lag is started by skipping frames.
                     nextFrameMillis = currentFrameMillis + Settings.frameLagTime + rng.Next(Settings.frameLagRandom);

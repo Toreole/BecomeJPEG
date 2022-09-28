@@ -1,11 +1,9 @@
 ﻿using BecomeJPEG.src;
-using Emgu.CV.Flann;
+using DirectShowLib;
 using System;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace BecomeJPEG
 {
@@ -16,7 +14,9 @@ namespace BecomeJPEG
 
         private string templateName = "";
 
+        //Regex that validates integers from 0-999
         private readonly Regex int999_Regex = new Regex("(0|([1-9][0-9]{0,2}))");
+        //Regex that validates integers from 0-9999
         private readonly Regex int9999_Regex = new Regex("(0|([1-9][0-9]{0,3}))");
 
         public SettingsPanel()
@@ -39,6 +39,15 @@ namespace BecomeJPEG
                 //try to set the "Default" template
                 SetTextsFrom(Settings.ApplyTemplate("Default"));
 
+                //Fetch list of devices
+                DsDevice[] devices = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
+
+                //--TODO: Select device.
+                Logger.LogLine("Video Input Devices found:");
+                foreach (var device in devices)
+                {
+                    Logger.LogLine("> " + device.Name);
+                }
             }
         }
 
@@ -111,7 +120,7 @@ namespace BecomeJPEG
         //stop => shut down the jpeg window and stop camera frame grabbing.
         private void StartStopButton_Click(object sender, EventArgs e)
         {
-            StartStopButton.Text = "Stop";
+            StartStopButton.Text = StartStopButton.Text == "Stop"?  "Start":"Stop";
         }
 
         //the index should just be cached in here

@@ -51,9 +51,9 @@ namespace BecomeJPEG
                 //default templates.
                 templates = new List<QualityTemplate>()
                 {
-                    new QualityTemplate("high", 0, 100, 0, 0),
-                    new QualityTemplate("worst", 50, 0, 100, 100),
-                    new QualityTemplate("medium", 20, 4, 10, 20)
+                    new QualityTemplate("Default", 0, 100, 0, 0),
+                    new QualityTemplate("Awful", 50, 0, 100, 100),
+                    new QualityTemplate("Medium Quality", 20, 4, 10, 20)
                 };
             }
             else
