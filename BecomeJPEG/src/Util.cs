@@ -16,9 +16,8 @@ namespace BecomeJPEG
         internal static void ParseIntFromStrArr(ref int i, string[] arr, int index, int defaultValue)
         {
             if (index < arr.Length)
-                i = int.Parse(arr[index]);
-            else
-                i = defaultValue;
+                if (!int.TryParse(arr[index], out i)) //if parse fails, return the default value.
+                    i = defaultValue;
         }
 
         /// <summary>

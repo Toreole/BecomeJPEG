@@ -6,7 +6,9 @@ A tiny project powered by EgmuCV (the .NET OpenCV wrapper) to capture a webcam v
 Upon startup, you will be presented with the Settings Panel. This is a small comprehensive window to configure the settings of the application even before it first activates your webcam.
 
 Here's a gif showing that changing templates has become much easier as opposed to how it was in the console (no more typing, just double click one!).
+
 ![Changing Templates in GUI](images/change_template.gif)
+
 As before, saving a template with the active settings will override old templates of the same name.
 
 The GUI also features a small black textbox for logging. The same messages will also be saved in a log.txt next to the application (similarly to the templates.txt).

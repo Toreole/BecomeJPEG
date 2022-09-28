@@ -66,7 +66,8 @@
             this.TemplateNameInput.Size = new System.Drawing.Size(85, 20);
             this.TemplateNameInput.TabIndex = 2;
             this.TemplateNameInput.Text = "Default";
-            this.TemplateNameInput.TextChanged += new System.EventHandler(this.TemplateName_TextChanged);
+            this.TemplateNameInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TemplateName_KeyDown);
+            this.TemplateNameInput.Leave += new System.EventHandler(this.TemplateName_StopEdit);
             // 
             // QualityInput
             // 
@@ -77,6 +78,7 @@
             this.QualityInput.TabIndex = 3;
             this.QualityInput.Text = "100";
             this.QualityInput.TextChanged += new System.EventHandler(this.QualityInput_TextChanged);
+            this.QualityInput.Leave += new System.EventHandler(this.QualityInput_StopEdit);
             // 
             // NameLabel
             // 

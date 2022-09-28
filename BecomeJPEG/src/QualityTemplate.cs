@@ -7,7 +7,7 @@ namespace BecomeJPEG
     internal class QualityTemplate
     {
         internal string templateName;
-        internal float frameDropChance;
+        internal int frameDropChance;
         internal int compressionQuality;
         internal int frameLagTime;
         internal int frameLagRandom;
@@ -15,7 +15,7 @@ namespace BecomeJPEG
         //default values provided by constructor
         internal QualityTemplate()
         {
-            frameDropChance = 0.85f;
+            frameDropChance = 55;
             compressionQuality = 0;
             frameLagTime = 100;
             frameLagRandom = 400;
@@ -26,7 +26,7 @@ namespace BecomeJPEG
             templateName = name;
         }
 
-        internal QualityTemplate(string name, float dropRate, int quality, int lagTime, int lagRandom)
+        internal QualityTemplate(string name, int dropRate, int quality, int lagTime, int lagRandom)
         {
             templateName = name;
             frameDropChance = dropRate;
@@ -52,7 +52,7 @@ namespace BecomeJPEG
             if (args.Length == 0 || string.IsNullOrWhiteSpace(args[0]))
                 return null;
             QualityTemplate t = new QualityTemplate(args[0]);
-            ParseFloatFromStrArr(ref t.frameDropChance, args, 1, 0f);
+            ParseIntFromStrArr(ref t.frameDropChance, args, 1, 0);
             ParseIntFromStrArr(ref t.compressionQuality, args, 2, 100);
             ParseIntFromStrArr(ref t.frameLagTime, args, 3, 0);
             ParseIntFromStrArr(ref t.frameLagRandom, args, 4, 0);
@@ -69,7 +69,7 @@ namespace BecomeJPEG
         internal readonly int quality;
         internal readonly int lagTime;
         internal readonly int lagRandom;
-        internal readonly float dropChance;
+        internal readonly int dropChance;
         internal readonly bool isValid;
         internal readonly string name;
 

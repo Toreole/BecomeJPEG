@@ -13,8 +13,8 @@ namespace BecomeJPEG
         private const string templateFile = "templates.txt";
 
         //active settings.
-        internal static float frameDropChance = 0.85f;
-        internal static int compressionQuality = 0;
+        internal static int frameDropChance = 55;
+        private static int compressionQuality = 0;
         internal static int frameLagTime = 100;
         internal static int frameLagRandom = 400;
 
@@ -25,6 +25,8 @@ namespace BecomeJPEG
 
         //list of templates.
         private static List<QualityTemplate> templates = null;
+
+        private static SReadonlyQualityTemplate[] templateBuffer = new SReadonlyQualityTemplate[20];
 
         //Property that automatically clamps the quality between 0 and 100.
         internal static int CompressionQuality
@@ -50,8 +52,8 @@ namespace BecomeJPEG
                 templates = new List<QualityTemplate>()
                 {
                     new QualityTemplate("high", 0, 100, 0, 0),
-                    new QualityTemplate("worst", 0.5f, 0, 100, 100),
-                    new QualityTemplate("medium", 0.2f, 4, 10, 20)
+                    new QualityTemplate("worst", 50, 0, 100, 100),
+                    new QualityTemplate("medium", 20, 4, 10, 20)
                 };
             }
             else
@@ -100,13 +102,13 @@ namespace BecomeJPEG
             QualityTemplate template = templates.Find(x => x.templateName == name);
             if (template == null)
             {
+                Logger.LogLine($"Created new Template \"{name}\".");
                 template = new QualityTemplate(name);
                 templates.Add(template);
-                Logger.LogLine($"Overriding Template \"{name}\" with new values.");
             } 
             else
             {
-                Logger.LogLine($"Created new Template \"{name}\".");
+                Logger.LogLine($"Overriding Template \"{name}\" with new values.");
             }
             template.frameDropChance = frameDropChance;
             template.frameLagRandom = frameLagRandom;
@@ -117,7 +119,7 @@ namespace BecomeJPEG
         }
 
         //applies a template by name.
-        internal static void ApplyTemplate(string name)
+        internal static SReadonlyQualityTemplate ApplyTemplate(string name)
         {
             QualityTemplate foundTemplate = templates.Find(x => x.templateName == name);
             if (foundTemplate != null)
@@ -127,10 +129,12 @@ namespace BecomeJPEG
                 frameLagTime = foundTemplate.frameLagTime;
                 frameDropChance = foundTemplate.frameDropChance;
                 Logger.LogLine($"Applied Template \"{name}\".");
+                return new SReadonlyQualityTemplate(foundTemplate);
             }
             else
             {
                 Logger.LogLine($"Could not find Template \"{name}\".");
+                return default;
             }
         }
 
@@ -188,6 +192,18 @@ namespace BecomeJPEG
             }
         }
 
-        internal static IEnumerable<QualityTemplate> IterateTemplates() => templates;
+        internal static Span<SReadonlyQualityTemplate> IterateTemplates()
+        {
+            //resize the buffer if needed.
+            if(templateBuffer.Length < templates.Count)
+            {
+                templateBuffer = new SReadonlyQualityTemplate[templates.Count];
+            }
+            //fill the buffer
+            for(int i = 0; i < templates.Count; i++)
+                templateBuffer[i] = new SReadonlyQualityTemplate(templates[i]);
+            //return it as span.
+            return new Span<SReadonlyQualityTemplate>(templateBuffer, 0, templates.Count);
+        }
     }
 }
