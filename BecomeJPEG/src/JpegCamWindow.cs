@@ -15,7 +15,7 @@ namespace BecomeJPEG
         internal bool IsActive { get; set; } = true; //starts active when created.
 
         private readonly Random rng = new Random();
-        private int cameraIndex;
+        private readonly int cameraIndex;
 
         private Mat frameMatrix;
         private Image<Bgr, byte> frame;
@@ -37,10 +37,14 @@ namespace BecomeJPEG
         {
             Logger.LogLine("Starting JpegCamWindow");
 
-            form = new Form();
-            form.Text = "BecomeJPEG";
-            imageBox = new ImageBox();
-            imageBox.Size = new System.Drawing.Size(640, 480);
+            form = new Form
+            {
+                Text = "BecomeJPEG"
+            };
+            imageBox = new ImageBox
+            {
+                Size = new System.Drawing.Size(640, 480)
+            };
             form.Controls.Add(imageBox);
             form.AutoSize = true;
 
@@ -82,8 +86,17 @@ namespace BecomeJPEG
                 while (IsActive)
                 {
                     long currentMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                    if (nextFrameMillis > currentMillis && (Settings.frameLagRandom | Settings.frameLagTime) != 0)
+                        goto loop_end;
+                    
+                    //chance for frame to be dropped is checked before anything else.
+                    if (rng.Next(100) <= Settings.frameDropChance)
+                    {
+                        //lag is started by skipping frames.
+                        nextFrameMillis = currentMillis + (long)(1000 / targetFrameRate) + Settings.frameLagTime + rng.Next(Settings.frameLagRandom);
+                        goto loop_end;
+                    }
                     nextFrameMillis = currentMillis + (long)(1000 / targetFrameRate);
-                    await Task.Delay((int)(1000 / targetFrameRate));
                     capture.Grab();
                     capture.Retrieve(frame);
                     if(Settings.CompressionQuality == 100)
@@ -96,6 +109,8 @@ namespace BecomeJPEG
                         CvInvoke.Imdecode(data, ImreadModes.Color, frameMatrix);
                         imageBox.Image = frameMatrix;
                     }
+                    loop_end:
+                    await Task.Delay((int)(1000 / targetFrameRate));
                 }
 
                 //clean up anything left to clean up.

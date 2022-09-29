@@ -109,6 +109,7 @@
             this.DroprateInput.TabIndex = 4;
             this.DroprateInput.Text = "0";
             this.DroprateInput.TextChanged += new System.EventHandler(this.DroprateInput_TextChanged);
+            this.DroprateInput.Leave += new System.EventHandler(this.DroprateInput_StopEdit);
             // 
             // DroprateLabel
             // 
@@ -137,6 +138,7 @@
             this.LagtimeInput.TabIndex = 8;
             this.LagtimeInput.Text = "0";
             this.LagtimeInput.TextChanged += new System.EventHandler(this.LagtimeInput_TextChanged);
+            this.LagtimeInput.Leave += new System.EventHandler(this.LagtimeInput_StopEdit);
             // 
             // LagrandomLabel
             // 
@@ -156,6 +158,7 @@
             this.LagrandomInput.TabIndex = 10;
             this.LagrandomInput.Text = "0";
             this.LagrandomInput.TextChanged += new System.EventHandler(this.LagrandomInput_TextChanged);
+            this.LagrandomInput.Leave += new System.EventHandler(this.LagrandomInput_StopEdit);
             // 
             // TemplateList
             // 
@@ -233,6 +236,7 @@
             this.DeviceSelection.Size = new System.Drawing.Size(209, 21);
             this.DeviceSelection.TabIndex = 16;
             this.DeviceSelection.Text = "- Select Device -";
+            this.DeviceSelection.SelectedIndexChanged += new System.EventHandler(this.DeviceSelection_IndexChanged);
             // 
             // DeviceSelectionLabel
             // 

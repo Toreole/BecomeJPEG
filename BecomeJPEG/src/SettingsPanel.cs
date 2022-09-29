@@ -46,11 +46,12 @@ namespace BecomeJPEG
                 //Fetch list of devices
                 DsDevice[] devices = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
 
+                //start-stop-button always starts out disabled before a selection is made.
+                StartStopButton.Enabled = false;
                 //requires at least one device to be present.
-                if(devices.Length == 0)
+                if (devices.Length == 0)
                 {
                     Logger.LogLine("Could not find any Camera Devices.");
-                    StartStopButton.Enabled = false;
                     DeviceSelection.Enabled = false;
                 }
                 else
@@ -80,12 +81,10 @@ namespace BecomeJPEG
             QualityInput.Text = Settings.CompressionQuality.ToString();
             
         }
-
         private void QualityInput_StopEdit(object sender, EventArgs e)
         {
             //if the textbox is empty (or whitespace), reset it to 0
             Settings.CompressionQuality = ResetIntTextBoxToZeroIfEmpty(QualityInput, Settings.CompressionQuality);
-            
         }
 
         //templatename is the name of the current template, this will not really do anything.
@@ -101,6 +100,8 @@ namespace BecomeJPEG
         //droprate should also just be an integer from 0 to 100, doesnt make much difference for it to be a float.
         private void DroprateInput_TextChanged(object sender, EventArgs e)
         {
+            if (DroprateInput.Text.Length == 0)
+                return;
             int val = ValidateIntTextBox(DroprateInput, int999_Regex, (int)(Settings.frameDropChance));
             if(val != -1)
             {
@@ -108,10 +109,16 @@ namespace BecomeJPEG
             }
             DroprateInput.Text = Settings.frameDropChance.ToString();
         }
+        private void DroprateInput_StopEdit(object sender, EventArgs e)
+        {
+            Settings.frameDropChance = ResetIntTextBoxToZeroIfEmpty(DroprateInput, Settings.frameDropChance);
+        }
 
         //lagtime is an integer from 0 to 9999
         private void LagtimeInput_TextChanged(object sender, EventArgs e)
         {
+            if (LagtimeInput.Text.Length == 0)
+                return;
             int val = ValidateIntTextBox(LagtimeInput, int9999_Regex, Settings.frameLagTime);
             if(val != -1)
             {
@@ -119,16 +126,26 @@ namespace BecomeJPEG
             }
             LagtimeInput.Text = Settings.frameLagTime.ToString();
         }
+        private void LagtimeInput_StopEdit(object sender, EventArgs e)
+        {
+            Settings.frameLagTime = ResetIntTextBoxToZeroIfEmpty(LagtimeInput, Settings.frameLagTime);
+        }
 
         //lagrandom is an integer from 0 to 9999
         private void LagrandomInput_TextChanged(object sender, EventArgs e)
         {
+            if (LagrandomInput.Text.Length == 0)
+                return; 
             int val = ValidateIntTextBox(LagrandomInput, int9999_Regex, Settings.frameLagRandom);
             if( val != -1)
             {
                 Settings.frameLagRandom = val;
             }
             LagrandomInput.Text = Settings.frameLagRandom.ToString();
+        }
+        private void LagrandomInput_StopEdit(object sender, EventArgs e)
+        {
+            Settings.frameLagRandom = ResetIntTextBoxToZeroIfEmpty(LagrandomInput, Settings.frameLagRandom);
         }
 
         //The startstop button should toggle between "stop" and "start".
@@ -138,7 +155,7 @@ namespace BecomeJPEG
         {
             if(cameraWindow == null || cameraWindow.IsActive == false)
             {
-                cameraWindow = new JpegCamWindow(0); //TODO: use the index of the selected camera. if any.
+                cameraWindow = new JpegCamWindow(DeviceSelection.SelectedIndex);
                 cameraWindow.OnBeforeExit += ResetStartButton;
                 cameraWindowTask = cameraWindow.Run();
                 //dispose once it finished running.
@@ -192,6 +209,12 @@ namespace BecomeJPEG
         {
             Settings.DeleteTemplate(selectedTemplateIndex);
             RefreshTemplateList();
+        }
+
+        private void DeviceSelection_IndexChanged(object sender, EventArgs e)
+        {
+            if (DeviceSelection.SelectedIndex >= 0)
+                StartStopButton.Enabled = true;
         }
 
         /// <summary>
