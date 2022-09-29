@@ -2,7 +2,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -31,39 +30,35 @@ namespace BecomeJPEG
         //set up the panel upon loading it.
         private void SettingsPanel_Load(object sender, EventArgs e)
         {
-            //double check + cast
-            if (sender is SettingsPanel panel)
+            //Setup the template list.
+            RefreshTemplateList();
+
+            //set up logging.
+            Logger.Init(this.LogText);
+
+            //try to set the "Default" template
+            SetTextsFrom(Settings.ApplyTemplate("Default"));
+
+            //Fetch list of devices
+            DsDevice[] devices = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
+
+            //start-stop-button always starts out disabled before a selection is made.
+            StartStopButton.Enabled = false;
+            //requires at least one device to be present.
+            if (devices.Length == 0)
             {
-                //Setup the template list.
-                RefreshTemplateList();
-
-                //set up logging.
-                Logger.Init(this.LogText);
-
-                //try to set the "Default" template
-                SetTextsFrom(Settings.ApplyTemplate("Default"));
-
-                //Fetch list of devices
-                DsDevice[] devices = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
-
-                //start-stop-button always starts out disabled before a selection is made.
-                StartStopButton.Enabled = false;
-                //requires at least one device to be present.
-                if (devices.Length == 0)
+                Logger.LogLine("Could not find any Camera Devices.");
+                DeviceSelection.Enabled = false;
+            }
+            else
+            {
+                var deviceList = this.DeviceSelection.Items;
+                deviceList.Clear();
+                //put em all in the list, and dispose of them
+                for (int i = 0; i < devices.Length; i++)
                 {
-                    Logger.LogLine("Could not find any Camera Devices.");
-                    DeviceSelection.Enabled = false;
-                }
-                else
-                {
-                    var deviceList = this.DeviceSelection.Items;
-                    deviceList.Clear();
-                    //put em all in the list, and dispose of them
-                    for(int i = 0; i < devices.Length; i++)
-                    {
-                        deviceList.Add(devices[i].Name);
-                        devices[i].Dispose();
-                    }
+                    deviceList.Add(devices[i].Name);
+                    devices[i].Dispose();
                 }
             }
         }

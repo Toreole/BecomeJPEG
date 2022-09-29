@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Windows.Forms;
-
-namespace BecomeJPEG
+﻿namespace BecomeJPEG
 {
     internal static class Util
     {

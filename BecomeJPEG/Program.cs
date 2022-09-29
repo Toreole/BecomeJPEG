@@ -1,10 +1,7 @@
-﻿using System;
-using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
-
-namespace BecomeJPEG
+﻿namespace BecomeJPEG
 {
+    //Note all this stuff is necessary because this project runs on an older version of C#
+    //and therefore does not allow top-level-statements yet.
     internal class Program
     {
         //entry point. you know how it is.
