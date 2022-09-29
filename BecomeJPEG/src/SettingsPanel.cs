@@ -50,6 +50,8 @@ namespace BecomeJPEG
                 if(devices.Length == 0)
                 {
                     Logger.LogLine("Could not find any Camera Devices.");
+                    StartStopButton.Enabled = false;
+                    DeviceSelection.Enabled = false;
                 }
                 else
                 {
@@ -136,7 +138,8 @@ namespace BecomeJPEG
         {
             if(cameraWindow == null || cameraWindow.IsActive == false)
             {
-                cameraWindow = new JpegCamWindow(0);
+                cameraWindow = new JpegCamWindow(0); //TODO: use the index of the selected camera. if any.
+                cameraWindow.OnBeforeExit += ResetStartButton;
                 cameraWindowTask = cameraWindow.Run();
                 //dispose once it finished running.
                 cameraWindowTask.GetAwaiter().OnCompleted(DisposeTask);
@@ -147,11 +150,18 @@ namespace BecomeJPEG
                     cameraWindowTask.Dispose();
                     cameraWindowTask = null;
                     StartStopButton.Enabled = true;
+                    cameraWindow = null;
                 }
+                
             }
             else
             {
                 cameraWindow.IsActive = false;
+                ResetStartButton();
+            }
+
+            void ResetStartButton()
+            {
                 StartStopButton.Text = "Start";
                 StartStopButton.Enabled = false;
             }
