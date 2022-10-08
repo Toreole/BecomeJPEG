@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Emgu.CV;
 
 namespace BecomeJPEG
 {
@@ -21,6 +22,11 @@ namespace BecomeJPEG
 
         private JpegCamWindow cameraWindow;
         private Task cameraWindowTask;
+
+        //storing VideoCaptures for re-use is a bit of a mixed bag:
+        // + avoids memory issues, because it leaks upon creation/deletion
+        // - causes the activity LED to stay on permanently while the settings panel is opened.
+        private VideoCapture[] captures;
 
         public SettingsPanel()
         {
@@ -42,6 +48,9 @@ namespace BecomeJPEG
             //Fetch list of devices
             DsDevice[] devices = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
 
+            //each capture corresponds to one specific device.
+            captures = new VideoCapture[devices.Length];
+
             //start-stop-button always starts out disabled before a selection is made.
             StartStopButton.Enabled = false;
             //requires at least one device to be present.
@@ -61,6 +70,14 @@ namespace BecomeJPEG
                     devices[i].Dispose();
                 }
             }
+        }
+
+        //Upon closing dispose of all unused data properly.
+        private void SettingsPanel_Closing(object sender, FormClosingEventArgs e)
+        {
+            foreach(var cap in captures)
+                if (cap != null)
+                    cap.Dispose();
         }
 
         //quality needs to be a integer between 0 and 100
@@ -150,7 +167,15 @@ namespace BecomeJPEG
         {
             if(cameraWindow == null || cameraWindow.IsActive == false)
             {
-                cameraWindow = new JpegCamWindow(DeviceSelection.SelectedIndex);
+                VideoCapture capture = captures[DeviceSelection.SelectedIndex];
+                //create capture if not yet created.
+                if(capture == null)
+                {
+                    capture = new VideoCapture(DeviceSelection.SelectedIndex);
+                    captures[DeviceSelection.SelectedIndex] = capture;
+                }
+                //create the window.
+                cameraWindow = new JpegCamWindow(capture);
                 cameraWindow.OnBeforeExit += ResetStartButton;
                 cameraWindowTask = cameraWindow.Run();
                 //dispose once it finished running.
@@ -159,6 +184,7 @@ namespace BecomeJPEG
 
                 void DisposeTask()
                 {
+                    capture.Stop();
                     cameraWindowTask.Dispose();
                     cameraWindowTask = null;
                     StartStopButton.Enabled = true;
@@ -305,5 +331,6 @@ namespace BecomeJPEG
             if(e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
                 this.ActiveControl = null;
         }
+
     }
 }

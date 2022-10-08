@@ -270,6 +270,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "SettingsPanel";
             this.Text = "BecomeJPEG Settings Panel";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsPanel_Closing);
             this.Load += new System.EventHandler(this.SettingsPanel_Load);
             this.TemplatePanel.ResumeLayout(false);
             this.TemplatePanel.PerformLayout();
