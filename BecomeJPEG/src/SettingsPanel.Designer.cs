@@ -47,14 +47,16 @@
             this.LogText = new System.Windows.Forms.TextBox();
             this.DeviceSelection = new System.Windows.Forms.ComboBox();
             this.DeviceSelectionLabel = new System.Windows.Forms.Label();
+            this.ResolutionSelection = new System.Windows.Forms.ComboBox();
+            this.ResolutionLabel = new System.Windows.Forms.Label();
             this.TemplatePanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // StartStopButton
             // 
-            this.StartStopButton.Location = new System.Drawing.Point(12, 200);
+            this.StartStopButton.Location = new System.Drawing.Point(354, 221);
             this.StartStopButton.Name = "StartStopButton";
-            this.StartStopButton.Size = new System.Drawing.Size(209, 25);
+            this.StartStopButton.Size = new System.Drawing.Size(103, 25);
             this.StartStopButton.TabIndex = 0;
             this.StartStopButton.Text = "Start";
             this.StartStopButton.UseVisualStyleBackColor = true;
@@ -163,7 +165,7 @@
             // TemplateList
             // 
             this.TemplateList.FormattingEnabled = true;
-            this.TemplateList.Location = new System.Drawing.Point(3, 33);
+            this.TemplateList.Location = new System.Drawing.Point(0, 16);
             this.TemplateList.Name = "TemplateList";
             this.TemplateList.Size = new System.Drawing.Size(197, 134);
             this.TemplateList.TabIndex = 12;
@@ -176,15 +178,15 @@
             this.TemplatePanel.Controls.Add(this.TemplateDelete);
             this.TemplatePanel.Controls.Add(this.TemplateLabel);
             this.TemplatePanel.Controls.Add(this.TemplateList);
-            this.TemplatePanel.Location = new System.Drawing.Point(227, 12);
+            this.TemplatePanel.Location = new System.Drawing.Point(264, 3);
             this.TemplatePanel.Name = "TemplatePanel";
-            this.TemplatePanel.Size = new System.Drawing.Size(203, 213);
+            this.TemplatePanel.Size = new System.Drawing.Size(203, 189);
             this.TemplatePanel.TabIndex = 13;
             // 
             // TemplateAddButton
             // 
             this.TemplateAddButton.BackColor = System.Drawing.Color.ForestGreen;
-            this.TemplateAddButton.Location = new System.Drawing.Point(102, 169);
+            this.TemplateAddButton.Location = new System.Drawing.Point(99, 147);
             this.TemplateAddButton.Name = "TemplateAddButton";
             this.TemplateAddButton.Size = new System.Drawing.Size(98, 41);
             this.TemplateAddButton.TabIndex = 17;
@@ -195,7 +197,7 @@
             // TemplateDelete
             // 
             this.TemplateDelete.BackColor = System.Drawing.Color.Red;
-            this.TemplateDelete.Location = new System.Drawing.Point(0, 169);
+            this.TemplateDelete.Location = new System.Drawing.Point(0, 147);
             this.TemplateDelete.Name = "TemplateDelete";
             this.TemplateDelete.Size = new System.Drawing.Size(102, 41);
             this.TemplateDelete.TabIndex = 16;
@@ -206,7 +208,7 @@
             // TemplateLabel
             // 
             this.TemplateLabel.AutoSize = true;
-            this.TemplateLabel.Location = new System.Drawing.Point(3, 10);
+            this.TemplateLabel.Location = new System.Drawing.Point(0, 3);
             this.TemplateLabel.Name = "TemplateLabel";
             this.TemplateLabel.Size = new System.Drawing.Size(102, 13);
             this.TemplateLabel.TabIndex = 13;
@@ -217,21 +219,20 @@
             this.LogText.BackColor = System.Drawing.SystemColors.InactiveCaptionText;
             this.LogText.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LogText.ForeColor = System.Drawing.SystemColors.Window;
-            this.LogText.Location = new System.Drawing.Point(12, 228);
-            this.LogText.MaximumSize = new System.Drawing.Size(420, 100);
+            this.LogText.Location = new System.Drawing.Point(12, 252);
             this.LogText.MaxLength = 800;
             this.LogText.MinimumSize = new System.Drawing.Size(420, 70);
             this.LogText.Multiline = true;
             this.LogText.Name = "LogText";
             this.LogText.ReadOnly = true;
             this.LogText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.LogText.Size = new System.Drawing.Size(420, 82);
+            this.LogText.Size = new System.Drawing.Size(445, 82);
             this.LogText.TabIndex = 14;
             // 
             // DeviceSelection
             // 
             this.DeviceSelection.FormattingEnabled = true;
-            this.DeviceSelection.Location = new System.Drawing.Point(12, 170);
+            this.DeviceSelection.Location = new System.Drawing.Point(12, 224);
             this.DeviceSelection.Name = "DeviceSelection";
             this.DeviceSelection.Size = new System.Drawing.Size(209, 21);
             this.DeviceSelection.TabIndex = 16;
@@ -241,17 +242,37 @@
             // DeviceSelectionLabel
             // 
             this.DeviceSelectionLabel.AutoSize = true;
-            this.DeviceSelectionLabel.Location = new System.Drawing.Point(9, 154);
+            this.DeviceSelectionLabel.Location = new System.Drawing.Point(9, 209);
             this.DeviceSelectionLabel.Name = "DeviceSelectionLabel";
             this.DeviceSelectionLabel.Size = new System.Drawing.Size(78, 13);
             this.DeviceSelectionLabel.TabIndex = 17;
             this.DeviceSelectionLabel.Text = "Target Device:";
             // 
+            // ResolutionSelection
+            // 
+            this.ResolutionSelection.FormattingEnabled = true;
+            this.ResolutionSelection.Location = new System.Drawing.Point(227, 224);
+            this.ResolutionSelection.Name = "ResolutionSelection";
+            this.ResolutionSelection.Size = new System.Drawing.Size(121, 21);
+            this.ResolutionSelection.TabIndex = 18;
+            this.ResolutionSelection.SelectedIndexChanged += new System.EventHandler(this.ResolutionSelectionChanged);
+            // 
+            // ResolutionLabel
+            // 
+            this.ResolutionLabel.AutoSize = true;
+            this.ResolutionLabel.Location = new System.Drawing.Point(227, 208);
+            this.ResolutionLabel.Name = "ResolutionLabel";
+            this.ResolutionLabel.Size = new System.Drawing.Size(60, 13);
+            this.ResolutionLabel.TabIndex = 19;
+            this.ResolutionLabel.Text = "Resolution:";
+            // 
             // SettingsPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(438, 314);
+            this.ClientSize = new System.Drawing.Size(469, 346);
+            this.Controls.Add(this.ResolutionLabel);
+            this.Controls.Add(this.ResolutionSelection);
             this.Controls.Add(this.DeviceSelectionLabel);
             this.Controls.Add(this.DeviceSelection);
             this.Controls.Add(this.LogText);
@@ -300,5 +321,7 @@
         private System.Windows.Forms.TextBox LogText;
         private System.Windows.Forms.ComboBox DeviceSelection;
         private System.Windows.Forms.Label DeviceSelectionLabel;
+        private System.Windows.Forms.ComboBox ResolutionSelection;
+        private System.Windows.Forms.Label ResolutionLabel;
     }
 }

@@ -27,6 +27,9 @@ namespace BecomeJPEG
         // + avoids memory issues, because it leaks upon creation/deletion
         // - causes the activity LED to stay on permanently while the settings panel is opened.
         private VideoCapture[] captures;
+        private int selectedDevice = -1;
+
+        private Resolution[][] resolutionsPerDevice;
 
         public SettingsPanel()
         {
@@ -63,9 +66,12 @@ namespace BecomeJPEG
             {
                 var deviceList = this.DeviceSelection.Items;
                 deviceList.Clear();
+                resolutionsPerDevice = new Resolution[devices.Length][];
+
                 //put em all in the list, and dispose of them
                 for (int i = 0; i < devices.Length; i++)
                 {
+                    resolutionsPerDevice[i] = Util.GetAllAvailableResolutions(devices[i]).ToArray();
                     deviceList.Add(devices[i].Name);
                     devices[i].Dispose();
                 }
@@ -174,8 +180,10 @@ namespace BecomeJPEG
                     capture = new VideoCapture(DeviceSelection.SelectedIndex);
                     captures[DeviceSelection.SelectedIndex] = capture;
                 }
+                //fetch desired resolution
+                var res = resolutionsPerDevice[DeviceSelection.SelectedIndex][ResolutionSelection.SelectedIndex];
                 //create the window.
-                cameraWindow = new JpegCamWindow(capture);
+                cameraWindow = new JpegCamWindow(capture, res);
                 cameraWindow.OnBeforeExit += ResetStartButton;
                 cameraWindowTask = cameraWindow.Run();
                 //dispose once it finished running.
@@ -232,10 +240,40 @@ namespace BecomeJPEG
             RefreshTemplateList();
         }
 
+        /// <summary>
+        /// Notification that the DeviceSelections selected index has changed.
+        /// </summary>
         private void DeviceSelection_IndexChanged(object sender, EventArgs e)
         {
-            if (DeviceSelection.SelectedIndex >= 0)
+            int previous = selectedDevice;
+            selectedDevice = DeviceSelection.SelectedIndex;
+            if (selectedDevice >= 0)
+            {
+                //enable resolution selection and assign items.
+                ResolutionSelection.Enabled = true;
+                if (selectedDevice != previous)
+                {
+                    //if the webcam window is not currently open, disable the button until a resolution was selected.
+                    if(cameraWindow == null)
+                    {
+                        StartStopButton.Enabled = false;
+                    }
+                    //clear and assign new.
+                    var itms = ResolutionSelection.Items; itms.Clear();
+                    itms.AddRange(resolutionsPerDevice[selectedDevice]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// resolutionSelection selected index has changed.
+        /// </summary>
+        private void ResolutionSelectionChanged(object sender, EventArgs e)
+        {
+            if(ResolutionSelection.SelectedIndex >= 0)
+            {
                 StartStopButton.Enabled = true;
+            }
         }
 
         /// <summary>

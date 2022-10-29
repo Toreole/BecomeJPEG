@@ -113,6 +113,7 @@
   <ItemGroup>
     <Compile Include="src\JpegCamWindow.cs" />
     <Compile Include="src\Logger.cs" />
+    <Compile Include="src\Resolution.cs" />
     <Compile Include="src\Settings.cs" />
     <Compile Include="src\SettingsPanel.cs">
       <SubType>Form</SubType>

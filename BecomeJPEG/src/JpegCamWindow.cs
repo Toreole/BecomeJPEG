@@ -27,22 +27,27 @@ namespace BecomeJPEG
 
         internal event Action OnBeforeExit;
 
-        internal JpegCamWindow(VideoCapture cap)
+        internal JpegCamWindow(VideoCapture cap, Resolution res)
         {
             capture = cap;
+            //apply resolution to capture
+            Logger.LogLine("Trying to set capture size to: " + res.ToString());
+            capture.SetCaptureProperty(CapProp.FrameWidth, res.width);
+            capture.SetCaptureProperty(CapProp.FrameHeight, res.height);
         }
 
         internal async Task Run()
         {
             Logger.LogLine("Starting JpegCamWindow");
-
+            Resolution captureRes = new Resolution(capture.Width, capture.Height);
+            Logger.LogLine("Resolution: " + captureRes.ToString());
             form = new Form
             {
                 Text = "BecomeJPEG"
             };
             imageBox = new ImageBox
             {
-                Size = new System.Drawing.Size(640, 480)
+                Size = new System.Drawing.Size(captureRes.width, captureRes.height)
             };
             form.Controls.Add(imageBox);
             form.AutoSize = true;
@@ -54,17 +59,11 @@ namespace BecomeJPEG
             //create the window.
             //CvInvoke.NamedWindow(Settings.windowName);
 
-            //--TODO: capture resolution configurable by user.
-            capture.SetCaptureProperty(CapProp.FrameWidth, 640);
-            capture.SetCaptureProperty(CapProp.FrameHeight, 360);
-
-            Logger.LogLine($"Capture size: {capture.Width}x{capture.Height}");
-
             //defining both of these up here avoids a LOT of garbage.
             //frame is required for compressing the data into Jpeg format.
-            frame = new Image<Bgr, byte>(capture.Width, capture.Height);
+            frame = new Image<Bgr, byte>(captureRes.width, captureRes.height);
             //the frameMatrix is needed to read the jpeg data into a displayable image again.
-            frameMatrix = new Mat(capture.Width, capture.Height, DepthType.Cv8U, 3);
+            frameMatrix = new Mat(captureRes.width, captureRes.height, DepthType.Cv8U, 3);
 
             // first frame should always show immediately.
             nextFrameMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
