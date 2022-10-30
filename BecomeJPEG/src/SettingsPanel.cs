@@ -26,6 +26,7 @@ namespace BecomeJPEG
         //storing VideoCaptures for re-use is a bit of a mixed bag:
         // + avoids memory issues, because it leaks upon creation/deletion
         // - causes the activity LED to stay on permanently while the settings panel is opened.
+        // - Captures only allow you to set the Resolution before the first frame was grabbed.
         private VideoCapture[] captures;
         private int selectedDevice = -1;
 

@@ -54,6 +54,7 @@
             // 
             // StartStopButton
             // 
+            this.StartStopButton.Enabled = false;
             this.StartStopButton.Location = new System.Drawing.Point(354, 221);
             this.StartStopButton.Name = "StartStopButton";
             this.StartStopButton.Size = new System.Drawing.Size(103, 25);
@@ -165,7 +166,7 @@
             // TemplateList
             // 
             this.TemplateList.FormattingEnabled = true;
-            this.TemplateList.Location = new System.Drawing.Point(0, 16);
+            this.TemplateList.Location = new System.Drawing.Point(0, 24);
             this.TemplateList.Name = "TemplateList";
             this.TemplateList.Size = new System.Drawing.Size(197, 134);
             this.TemplateList.TabIndex = 12;
@@ -180,13 +181,13 @@
             this.TemplatePanel.Controls.Add(this.TemplateList);
             this.TemplatePanel.Location = new System.Drawing.Point(264, 3);
             this.TemplatePanel.Name = "TemplatePanel";
-            this.TemplatePanel.Size = new System.Drawing.Size(203, 189);
+            this.TemplatePanel.Size = new System.Drawing.Size(203, 202);
             this.TemplatePanel.TabIndex = 13;
             // 
             // TemplateAddButton
             // 
             this.TemplateAddButton.BackColor = System.Drawing.Color.ForestGreen;
-            this.TemplateAddButton.Location = new System.Drawing.Point(99, 147);
+            this.TemplateAddButton.Location = new System.Drawing.Point(99, 158);
             this.TemplateAddButton.Name = "TemplateAddButton";
             this.TemplateAddButton.Size = new System.Drawing.Size(98, 41);
             this.TemplateAddButton.TabIndex = 17;
@@ -197,7 +198,7 @@
             // TemplateDelete
             // 
             this.TemplateDelete.BackColor = System.Drawing.Color.Red;
-            this.TemplateDelete.Location = new System.Drawing.Point(0, 147);
+            this.TemplateDelete.Location = new System.Drawing.Point(0, 158);
             this.TemplateDelete.Name = "TemplateDelete";
             this.TemplateDelete.Size = new System.Drawing.Size(102, 41);
             this.TemplateDelete.TabIndex = 16;
@@ -208,7 +209,7 @@
             // TemplateLabel
             // 
             this.TemplateLabel.AutoSize = true;
-            this.TemplateLabel.Location = new System.Drawing.Point(0, 3);
+            this.TemplateLabel.Location = new System.Drawing.Point(4, 5);
             this.TemplateLabel.Name = "TemplateLabel";
             this.TemplateLabel.Size = new System.Drawing.Size(102, 13);
             this.TemplateLabel.TabIndex = 13;
@@ -242,7 +243,7 @@
             // DeviceSelectionLabel
             // 
             this.DeviceSelectionLabel.AutoSize = true;
-            this.DeviceSelectionLabel.Location = new System.Drawing.Point(9, 209);
+            this.DeviceSelectionLabel.Location = new System.Drawing.Point(8, 203);
             this.DeviceSelectionLabel.Name = "DeviceSelectionLabel";
             this.DeviceSelectionLabel.Size = new System.Drawing.Size(78, 13);
             this.DeviceSelectionLabel.TabIndex = 17;
@@ -250,6 +251,7 @@
             // 
             // ResolutionSelection
             // 
+            this.ResolutionSelection.Enabled = false;
             this.ResolutionSelection.FormattingEnabled = true;
             this.ResolutionSelection.Location = new System.Drawing.Point(227, 224);
             this.ResolutionSelection.Name = "ResolutionSelection";
@@ -260,7 +262,7 @@
             // ResolutionLabel
             // 
             this.ResolutionLabel.AutoSize = true;
-            this.ResolutionLabel.Location = new System.Drawing.Point(227, 208);
+            this.ResolutionLabel.Location = new System.Drawing.Point(231, 205);
             this.ResolutionLabel.Name = "ResolutionLabel";
             this.ResolutionLabel.Size = new System.Drawing.Size(60, 13);
             this.ResolutionLabel.TabIndex = 19;
