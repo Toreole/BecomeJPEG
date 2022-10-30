@@ -254,14 +254,17 @@ namespace BecomeJPEG
                 ResolutionSelection.Enabled = true;
                 if (selectedDevice != previous)
                 {
+                    //clear and assign new resolutions
+                    var itms = ResolutionSelection.Items; itms.Clear();
+                    itms.AddRange(resolutionsPerDevice[selectedDevice]);
+                    ResolutionSelection.SelectedIndex = 0;
+                    ResolutionSelection.Text = "-";
+
                     //if the webcam window is not currently open, disable the button until a resolution was selected.
-                    if(cameraWindow == null)
+                    if (cameraWindow == null)
                     {
                         StartStopButton.Enabled = false;
                     }
-                    //clear and assign new.
-                    var itms = ResolutionSelection.Items; itms.Clear();
-                    itms.AddRange(resolutionsPerDevice[selectedDevice]);
                 }
             }
         }
