@@ -28,6 +28,7 @@ namespace BecomeJPEG
         private bool isRepeating = false;
         private int currentLoop = 0;
         private int loopCount = 0;
+        private long repeatCooldownUntil = 0;
 
         private long nextFrameMillis;
 
@@ -97,7 +98,7 @@ namespace BecomeJPEG
                     goto loop_end;
                 }
                 //next up are repeats
-                if (rng.Next(100) <= Settings.repeatChance && !isRepeating)
+                if (rng.Next(100) <= Settings.repeatChance && !isRepeating && repeatCooldownUntil < currentMillis)
                 {
                     isRepeating = true;
                     loopCount = rng.Next(Settings.repeatChain);
@@ -106,7 +107,7 @@ namespace BecomeJPEG
                 nextFrameMillis = currentMillis + (long)(1000 / targetFrameRate);
                 capture.Grab();
                 capture.Retrieve(frame);
-                UpdateShownFrame(frame);
+                UpdateShownFrame(frame, currentMillis);
                 EnqueueFrame(frame);
 			loop_end:
                 await Task.Delay((int)(1000 / targetFrameRate));
@@ -125,7 +126,7 @@ namespace BecomeJPEG
             new CancellationTokenSource().Cancel();
         }
 
-        private void UpdateShownFrame(Image<Bgr, byte> frame)
+        private void UpdateShownFrame(Image<Bgr, byte> frame, long currentMillis)
 		{
             //repeats override the frame being used in here.
 			if (isRepeating)
@@ -138,6 +139,7 @@ namespace BecomeJPEG
 						isRepeating = false;
                         currentLoop = 0;
 						currentBufferFrame = 0;
+                        repeatCooldownUntil = currentMillis + (long)Settings.repeatCooldown;
 					}
                 }
                 else
