@@ -142,7 +142,7 @@ namespace BecomeJPEG
                         repeatCooldownUntil = currentMillis + (long)Settings.repeatCooldown;
 					}
                 }
-                else
+                else if (frameBuffer.Count == Settings.repeatFrameCount) //only do repeat once buffer is full
                 {
                     frame.Data = frameBuffer[currentBufferFrame].Data;
                     currentBufferFrame++;
