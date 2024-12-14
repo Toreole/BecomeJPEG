@@ -14,6 +14,10 @@ namespace BecomeJPEG
         private static int compressionQuality = 0;
         internal static int frameLagTime = 100;
         internal static int frameLagRandom = 400;
+        internal static int repeatChance = 0;
+        internal static int repeatFrameCount = 12;
+        internal static int repeatCooldown = 0;
+        internal static int repeatChain = 1;
 
         //window name for the EgmuCV.
         internal const string windowName = "BecomeJPEG Preview";
@@ -48,9 +52,9 @@ namespace BecomeJPEG
                 //default templates.
                 templates = new List<QualityTemplate>()
                 {
-                    new QualityTemplate("Default", 0, 100, 0, 0),
-                    new QualityTemplate("Awful", 50, 0, 100, 100),
-                    new QualityTemplate("Medium Quality", 20, 4, 10, 20)
+                    new QualityTemplate("Default", 0, 100, 0, 0, 0, 0, 0, 1),
+					new QualityTemplate("Medium Quality", 20, 4, 10, 10, 0, 0, 0, 1),
+					new QualityTemplate("Awful", 50, 0, 100, 100, 0, 0, 0, 1)
                 };
             }
             else
@@ -111,6 +115,10 @@ namespace BecomeJPEG
             template.frameLagRandom = frameLagRandom;
             template.frameLagTime = frameLagTime;
             template.compressionQuality = CompressionQuality;
+            template.repeatChance = repeatChance;
+            template.repeatFrameCount = repeatFrameCount;
+            template.repeatCooldown = repeatCooldown;
+            template.repeatChain = repeatChain;
             //write templates to a file.
             SaveTemplatesToDrive();
         }
@@ -125,6 +133,11 @@ namespace BecomeJPEG
                 frameLagRandom = foundTemplate.frameLagRandom;
                 frameLagTime = foundTemplate.frameLagTime;
                 frameDropChance = foundTemplate.frameDropChance;
+                repeatChance = foundTemplate.repeatChance;
+                repeatFrameCount = foundTemplate.repeatFrameCount;
+                repeatCooldown = foundTemplate.repeatCooldown;
+                repeatChain = foundTemplate.repeatChain;
+
                 Logger.LogLine($"Applied Template \"{name}\".");
                 return new SReadonlyQualityTemplate(foundTemplate);
             }
@@ -149,6 +162,10 @@ namespace BecomeJPEG
                 frameLagRandom = template.frameLagRandom;
                 frameLagTime = template.frameLagTime;
                 frameDropChance = template.frameDropChance;
+                repeatChance = template.repeatChance;
+                repeatFrameCount = template.repeatFrameCount;
+                repeatCooldown = template.repeatCooldown;
+                repeatChain = template.repeatChain;
 
                 Logger.LogLine($"Applied Template \"{template.templateName}\".");
                 //return readonly copies of the template values.

@@ -83,8 +83,7 @@ namespace BecomeJPEG
         private void SettingsPanel_Closing(object sender, FormClosingEventArgs e)
         {
             foreach(var cap in captures)
-                if (cap != null)
-                    cap.Dispose();
+                cap?.Dispose();
         }
 
         //quality needs to be a integer between 0 and 100
@@ -167,10 +166,78 @@ namespace BecomeJPEG
             Settings.frameLagRandom = ResetIntTextBoxToZeroIfEmpty(LagrandomInput, Settings.frameLagRandom);
         }
 
-        //The startstop button should toggle between "stop" and "start".
-        //start => start the camera grabbing stuff, the part that actually does the JPEG funny.
-        //stop => shut down the jpeg window and stop camera frame grabbing.
-        private void StartStopButton_Click(object sender, EventArgs e)
+        //0 to 100 really, but its ok
+		private void RepeatChanceInput_TextChanged(object sender, EventArgs e)
+		{
+			if (RepeatChanceInput.Text.Length == 0)
+				return; //skip over empty text. That should be seperately handled in StopEdit. (Leave)
+			int val = ValidateIntTextBox(RepeatChanceInput, int999_Regex, Settings.repeatChance);
+			if (val != -1)
+			{
+				Settings.repeatChance = val;
+			}
+			RepeatChanceInput.Text = Settings.repeatChance.ToString();
+		}
+		private void RepeatChanceInput_StopEdit(object sender, EventArgs e)
+		{
+			Settings.repeatChance = ResetIntTextBoxToZeroIfEmpty(RepeatChanceInput, Settings.repeatChance);
+		}
+
+        //allows 0 to 999 but is recommended to keep down in the low 2 digits
+		private void RepeatFrameCountInput_TextChanged(object sender, EventArgs e)
+		{
+			if (RepeatFrameCountInput.Text.Length == 0)
+				return; //skip over empty text. That should be seperately handled in StopEdit. (Leave)
+			int val = ValidateIntTextBox(RepeatFrameCountInput, int999_Regex, Settings.repeatFrameCount);
+			if (val != -1)
+			{
+				Settings.repeatFrameCount = val;
+			}
+			RepeatFrameCountInput.Text = Settings.repeatFrameCount.ToString();
+		}
+		private void RepeatFrameCountInput_StopEdit(object sender, EventArgs e)
+		{
+			Settings.repeatFrameCount = ResetIntTextBoxToZeroIfEmpty(RepeatFrameCountInput, Settings.repeatFrameCount);
+		}
+
+        //0 to 9999 ms
+		private void RepeatCooldownInput_TextChanged(object sender, EventArgs e)
+		{
+			if (RepeatCooldownInput.Text.Length == 0)
+				return; //skip over empty text. That should be seperately handled in StopEdit. (Leave)
+			int val = ValidateIntTextBox(RepeatCooldownInput, int9999_Regex, Settings.repeatCooldown);
+			if (val != -1)
+			{
+				Settings.repeatCooldown = val;
+			}
+			RepeatCooldownInput.Text = Settings.repeatCooldown.ToString();
+		}
+		private void RepeatCooldownInput_StopEdit(object sender, EventArgs e)
+		{
+			Settings.repeatCooldown = ResetIntTextBoxToZeroIfEmpty(RepeatCooldownInput, Settings.repeatCooldown);
+		}
+
+        //ideally kept between 0 and 10. it should still try to move on and not repeat endlessly.
+		private void RepeatChainInput_StopEdit(object sender, EventArgs e)
+		{
+			if (RepeatChainInput.Text.Length == 0)
+				return; //skip over empty text. That should be seperately handled in StopEdit. (Leave)
+			int val = ValidateIntTextBox(RepeatChainInput, int999_Regex, Settings.repeatChain);
+			if (val != -1)
+			{
+				Settings.repeatChain = val;
+			}
+			RepeatChainInput.Text = Settings.repeatChain.ToString();
+		}
+		private void RepeatChainInput_TextChanged(object sender, EventArgs e)
+		{
+			Settings.repeatChain = ResetIntTextBoxToZeroIfEmpty(RepeatChainInput, Settings.repeatChain);
+		}
+
+		//The startstop button should toggle between "stop" and "start".
+		//start => start the camera grabbing stuff, the part that actually does the JPEG funny.
+		//stop => shut down the jpeg window and stop camera frame grabbing.
+		private void StartStopButton_Click(object sender, EventArgs e)
         {
             if(cameraWindow == null || cameraWindow.IsActive == false)
             {
@@ -314,6 +381,10 @@ namespace BecomeJPEG
                 this.LagtimeInput.Text = qualitySettings.lagTime.ToString();
                 this.DroprateInput.Text = qualitySettings.dropChance.ToString("0");
                 this.QualityInput.Text = qualitySettings.quality.ToString();
+                this.RepeatChanceInput.Text = qualitySettings.repeatChance.ToString();
+                this.RepeatFrameCountInput.Text = qualitySettings.repeatFrameCount.ToString();
+                this.RepeatCooldownInput.Text = qualitySettings.repeatCooldown.ToString();
+                this.RepeatChainInput.Text = qualitySettings.repeatChain.ToString();
             }
         }
 
@@ -351,7 +422,6 @@ namespace BecomeJPEG
         /// <param name="textBox"></param>
         /// <param name="regularValue"></param>
         /// <returns>The value that is used in the TextBox</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int ResetIntTextBoxToZeroIfEmpty(TextBox textBox, int regularValue)
         {
             string text = textBox.Text;
@@ -367,12 +437,11 @@ namespace BecomeJPEG
         /// Sets Form.ActiveControl to null if the KeyEvent is an Enter/Return press.
         /// </summary>
         /// <param name="e"></param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetNoneActiveOnEnterPress(KeyEventArgs e)
         {
             if(e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
                 this.ActiveControl = null;
         }
 
-    }
+	}
 }

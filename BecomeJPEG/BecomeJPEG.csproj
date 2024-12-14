@@ -111,6 +111,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\ArrayQueue.cs" />
     <Compile Include="src\JpegCamWindow.cs" />
     <Compile Include="src\Logger.cs" />
     <Compile Include="src\Resolution.cs" />

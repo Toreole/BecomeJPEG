@@ -11,6 +11,10 @@ namespace BecomeJPEG
         internal int compressionQuality;
         internal int frameLagTime;
         internal int frameLagRandom;
+        internal int repeatChance;
+        internal int repeatFrameCount;
+        internal int repeatCooldown;
+        internal int repeatChain;
 
         //default values provided by constructor
         internal QualityTemplate()
@@ -19,6 +23,10 @@ namespace BecomeJPEG
             compressionQuality = 0;
             frameLagTime = 100;
             frameLagRandom = 400;
+            repeatChance = 0;
+            repeatFrameCount = 12;
+            repeatCooldown = 100;
+            repeatChain = 1;
         }
 
         internal QualityTemplate(string name) : this()
@@ -26,18 +34,32 @@ namespace BecomeJPEG
             templateName = name;
         }
 
-        internal QualityTemplate(string name, int dropRate, int quality, int lagTime, int lagRandom)
+        internal QualityTemplate(
+            string name, 
+            int dropRate, 
+            int quality, 
+            int lagTime, 
+            int lagRandom, 
+            int repeatChance, 
+            int repeatFrameCount, 
+            int repeatCooldown, 
+            int repeatChain)
         {
             templateName = name;
             frameDropChance = dropRate;
             compressionQuality = quality;
             frameLagTime = lagTime;
             frameLagRandom = lagRandom;
+            this.repeatChance = repeatChance;
+            this.repeatFrameCount = repeatFrameCount;
+            this.repeatCooldown = repeatCooldown;
+            this.repeatChain = repeatChain;
         }
 
         public override string ToString()
         {
-            return $"{templateName}|{frameDropChance}|{compressionQuality}|{frameLagTime}|{frameLagRandom}";
+            return $"{templateName}|{frameDropChance}|{compressionQuality}|{frameLagTime}|{frameLagRandom}|" +
+                $"{repeatChance}|{repeatFrameCount}|{repeatCooldown}|{repeatChain}";
         }
 
         /// <summary>
@@ -56,7 +78,11 @@ namespace BecomeJPEG
             ParseIntFromStrArr(ref t.compressionQuality, args, 2, 100);
             ParseIntFromStrArr(ref t.frameLagTime, args, 3, 0);
             ParseIntFromStrArr(ref t.frameLagRandom, args, 4, 0);
-            return t;
+			ParseIntFromStrArr(ref t.repeatChance, args, 5, 0);
+			ParseIntFromStrArr(ref t.repeatFrameCount, args, 6, 12);
+			ParseIntFromStrArr(ref t.repeatCooldown, args, 7, 12);
+			ParseIntFromStrArr(ref t.repeatChain, args, 8, 12);
+			return t;
         }
     }
 
@@ -70,7 +96,12 @@ namespace BecomeJPEG
         internal readonly int lagTime;
         internal readonly int lagRandom;
         internal readonly int dropChance;
-        internal readonly bool isValid;
+		internal readonly int repeatChance;
+		internal readonly int repeatFrameCount;
+        internal readonly int repeatCooldown;
+        internal readonly int repeatChain;
+
+		internal readonly bool isValid;
         internal readonly string name;
 
         internal SReadonlyQualityTemplate(QualityTemplate qt)
@@ -81,6 +112,10 @@ namespace BecomeJPEG
             dropChance = qt.frameDropChance;
             isValid = true;
             name = qt.templateName;
-        }
+            repeatChance = qt.repeatChance;
+            repeatFrameCount = qt.repeatFrameCount;
+			repeatCooldown = qt.repeatCooldown;
+            repeatChain = qt.repeatChain;
+		}
     }
 }

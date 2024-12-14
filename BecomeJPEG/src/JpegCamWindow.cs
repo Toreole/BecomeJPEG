@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +22,13 @@ namespace BecomeJPEG
         private Mat frameMatrix;
         private Image<Bgr, byte> frame;
 
+        private int bufferSize;
+        private ArrayQueue<Image<Bgr, byte>> frameBuffer;
+        private int currentBufferFrame = 0;
+        private bool isRepeating = false;
+        private int currentLoop = 0;
+        private int loopCount = 0;
+
         private long nextFrameMillis;
 
         private Form form;
@@ -34,6 +43,8 @@ namespace BecomeJPEG
             Logger.LogLine("Trying to set capture size to: " + res.ToString());
             capture.SetCaptureProperty(CapProp.FrameWidth, res.width);
             capture.SetCaptureProperty(CapProp.FrameHeight, res.height);
+            bufferSize = Settings.repeatFrameCount;
+			frameBuffer = new ArrayQueue<Image<Bgr, byte>>(bufferSize);
         }
 
         internal async Task Run()
@@ -85,41 +96,90 @@ namespace BecomeJPEG
                     nextFrameMillis = currentMillis + (long)(1000 / targetFrameRate) + Settings.frameLagTime + rng.Next(Settings.frameLagRandom);
                     goto loop_end;
                 }
+                //next up are repeats
+                if (rng.Next(100) <= Settings.repeatChance && !isRepeating)
+                {
+                    isRepeating = true;
+                    loopCount = rng.Next(Settings.repeatChain);
+                    currentLoop = 0;
+                }
                 nextFrameMillis = currentMillis + (long)(1000 / targetFrameRate);
                 capture.Grab();
                 capture.Retrieve(frame);
-                if (Settings.CompressionQuality == 100)
-                {
-                    imageBox.Image = frame;
-                }
-                else
-                {
-                    byte[] data = frame.ToJpegData(Settings.CompressionQuality);
-                    CvInvoke.Imdecode(data, ImreadModes.Color, frameMatrix);
-                    imageBox.Image = frameMatrix;
-                }
-            loop_end:
+                UpdateShownFrame(frame);
+                EnqueueFrame(frame);
+			loop_end:
                 await Task.Delay((int)(1000 / targetFrameRate));
             }
 
             //clean up anything left to clean up.
-            capture.Stop();
-
             //capture.ImageGrabbed -= OnImageGrabbed;
 
             Logger.LogLine("Shutting down JpegCamWindow");
             form.Dispose();
             frameMatrix.Dispose();
-            frame.Dispose();
+			frame.Dispose();
+            capture.Stop();
             //CvInvoke.DestroyWindow(Settings.windowName);
             //i dont know what im doing
             new CancellationTokenSource().Cancel();
         }
+
+        private void UpdateShownFrame(Image<Bgr, byte> frame)
+		{
+            //repeats override the frame being used in here.
+			if (isRepeating)
+			{
+                if (currentBufferFrame == bufferSize)
+                {
+                    currentLoop++;
+                    if (currentLoop >= loopCount)
+                    {
+						isRepeating = false;
+                        currentLoop = 0;
+						currentBufferFrame = 0;
+					}
+                }
+                else
+                {
+                    frame.Data = frameBuffer[currentBufferFrame].Data;
+                    currentBufferFrame++;
+                }
+			}
+
+			if (Settings.CompressionQuality == 100)
+			{
+				imageBox.Image = frame;
+			}
+			else
+			{
+				byte[] data = frame.ToJpegData(Settings.CompressionQuality);
+				CvInvoke.Imdecode(data, ImreadModes.Color, frameMatrix);
+				imageBox.Image = frameMatrix;
+			}
+
+		}
 
         private void OnFormClosed(object sender, FormClosingEventArgs e)
         {
             OnBeforeExit?.Invoke();
             this.IsActive = false;
         }
+
+        private void EnqueueFrame(Image<Bgr, byte> frame)
+        {
+			if (bufferSize <= 0)
+			{
+                return;
+			}
+            // uses buffer
+			if (frameBuffer.Count == bufferSize)
+			{
+				var oldestFrame = frameBuffer.Dequeue();
+                oldestFrame.Dispose();
+			}
+            // this makes copies of previous frames, which needs to be disposed when dequeueing.
+			frameBuffer.Enqueue(new Image<Bgr, byte>(frame.Data));
+		}
     }
 }
